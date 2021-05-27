@@ -1,74 +1,75 @@
 #12/11/2020
-
+#
 # SPATIAL SOIL R  for VECTORS
-
-#   ROTH C phase 3: WARM UP
-
+#
+# ROTH C phase 3: WARM UP
+#
 # MSc Ing Agr Luciano E Di Paolo
 # Dr Ing Agr Guillermo E Peralta
 ###################################
-# SOilR from Sierra, C.A., M. Mueller, S.E. Trumbore (2012). 
-#Models of soil organic matter decomposition: the SoilR package, version 1.0 Geoscientific Model Development, 5(4), 
-#1045--1060. URL http://www.geosci-model-dev.net/5/1045/2012/gmd-5-1045-2012.html.
+#SoilR from Sierra, C.A., M. Mueller, S.E. Trumbore (2012). 
+#Models of soil organic matter decomposition: the SoilR package, 
+#version 1.0 Geoscientific Model Development, 5(4), 
+#1045--1060. 
+#URL http://www.geosci-model-dev.net/5/1045/2012/gmd-5-1045-2012.html.
 #####################################
 
+#Empty global environment
 rm(list=ls()) 
 
+#Load packages
 library(SoilR)
 library(raster)
 library(rgdal)
 library(soilassessment)
 library(foreach)
 library(doParallel)
-library(tcltk)
 
 
-
-working_dir<-setwd("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020")
+#Define a path to the working directory
+wd <-"D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020"
+#Set the working directory
+setwd(wd)
 
 #Open empty vector
-
 Vector<-readOGR("INPUTS/TARGET_POINTS/target_points_sub.shp")
 
 
 #Open Warm Up Stack
-
 Stack_Set_warmup<- stack("INPUTS/STACK/Stack_Set_WARM_UP_AOI.tif")
 
-# Open Result from SPIN UP PROCESS. A vector with 5 columns , one for each pool
-
+# Open Result from the spin up phase
+#A vector with 5 columns, one for each pool
 Spin_up<-readOGR("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/OUTPUTS/1_SPIN_UP/SPIN_UP_County_AOI.shp")
-#Spin_up<-as.data.frame(Spin_up)
 
-# Open Precipitation , temperature, and EVapotranspiration file 20 anios x 12 = 240 layers x 3
 
+# Open Precipitation , temperature, and Evapotranspiration file 
+# 20 years x 12 = 240 layers x 3
 PREC<-stack("INPUTS/CRU_LAYERS/Prec_Stack_216_01-18_CRU.tif")
 TEMP<-stack("INPUTS/CRU_LAYERS/Temp_Stack_216_01-18_CRU.tif")
 PET<-stack("INPUTS/CRU_LAYERS/PET_Stack_216_01-18_CRU.tif")
 
 #Open Mean NPP MIAMI 1981 - 2000
-
 NPP<-raster("INPUTS/NPP/NPP_MIAMI_MEAN_81-00_AOI.tif")
 
 NPP_MEAN_MIN<-raster("INPUTS/NPP/NPP_MIAMI_MEAN_81-00_AOI_MIN.tif")
 
 NPP_MEAN_MAX<-raster("INPUTS/NPP/NPP_MIAMI_MEAN_81-00_AOI_MAX.tif")
 
-#Open LU layer (year 2000).
-
+#Open the land use layer (year 2000).
 LU_AOI<-raster("INPUTS/LAND_USE/ESA_Land_Cover_12clases_FAO_AOI.tif")
 
 NPP<-resample(NPP,LU_AOI,method='bilinear')
 NPP_MEAN_MIN<-resample(NPP_MEAN_MIN,LU_AOI,method='bilinear')
 NPP_MEAN_MAX<-resample(NPP_MEAN_MAX,LU_AOI, method='bilinear')
-#Apply NPP coeficientes
+
+#Apply NPP coefficientes
 NPP<-(LU_AOI==2 | LU_AOI==12 | LU_AOI==13)*NPP*0.53+ (LU_AOI==4)*NPP*0.88 + (LU_AOI==3 | LU_AOI==5 | LU_AOI==6 | LU_AOI==8)*NPP*0.72
 NPP_MEAN_MIN<-(LU_AOI==2 | LU_AOI==12 | LU_AOI==13)*NPP_MEAN_MIN*0.53+ (LU_AOI==4)*NPP_MEAN_MIN*0.88 + (LU_AOI==3 | LU_AOI==5 | LU_AOI==6 | LU_AOI==8)*NPP_MEAN_MIN*0.72
 NPP_MEAN_MAX<-(LU_AOI==2 | LU_AOI==12 | LU_AOI==13)*NPP_MEAN_MAX*0.53+ (LU_AOI==4)*NPP_MEAN_MAX*0.88 + (LU_AOI==3 | LU_AOI==5 | LU_AOI==6 | LU_AOI==8)*NPP_MEAN_MAX*0.72
 
 
 # Extract variables to points
-
 Vector_points<-extract(Stack_Set_warmup,Vector,sp=TRUE)
 Vector_points<-extract(TEMP,Vector_points,sp=TRUE)
 Vector_points<-extract(PREC,Vector_points,sp=TRUE)
@@ -79,12 +80,8 @@ Vector_points<-extract(NPP_MEAN_MAX,Vector_points,sp=TRUE)
 
 WARM_UP<-Vector
 
-#use only for backup
-
-#WARM_UP<-readOGR("WARM_UP_County_AOI3_97.shp")
 
 # Warm Up number of years simulation 
-
 yearsSimulation<-dim(TEMP)[3]/12
 
 clim_layers<-yearsSimulation*12
@@ -202,9 +199,6 @@ NPP_M<-c()
 
 ##################################################################
 
-library(foreach)
-library(doParallel)
-
 n_cores <- detectCores() - 1
 n_cores
 
@@ -293,10 +287,10 @@ results <- foreach(j=1:length(listOfRows),.inorder = FALSE,.combine = rbind,.pac
           
           
           soil.thick=30  #Soil thickness (organic layer topsoil), in cm
-          SOC<-SOC_im      #Soil organic carbon in Mg/ha 
+          SOC<-SOC_im      #Soil organic carbon in t/ha 
           clay<-clay_im        #Percent clay %
           
-          DR<-DR_im[w,1]              # DPM/RPM (decomplosable vs resistant plant material.)
+          DR<-DR_im[w,1]              # DPM/RPM (decomposable vs resistant plant material)
           bare1<-(Cov1>0.8)           # If the surface is bare or vegetated
           NPP_81_00<-NPP_im
           NPP_81_00_MIN<-NPP_im_MIN
@@ -451,7 +445,7 @@ colnames(WARM_UP@data)[24]="Cin_max"
 
 # SAVE the Points (shapefile)
 setwd("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/OUTPUTS/2_WARM_UP")
-writeOGR(WARM_UP,".", "WARM_UP_County_AOI_parallell_test", driver="ESRI Shapefile",overwrite=TRUE)
+writeOGR(WARM_UP,".", "WARM_UP_Country_AOI", driver="ESRI Shapefile",overwrite=TRUE)
 
 
 
