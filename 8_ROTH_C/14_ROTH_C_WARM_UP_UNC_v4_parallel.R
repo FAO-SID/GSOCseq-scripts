@@ -28,6 +28,7 @@ library(doParallel)
 
 #Define a path to the working directory
 wd <-"D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020"
+
 #Set the working directory
 setwd(wd)
 
