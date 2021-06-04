@@ -202,10 +202,8 @@ NPP_M<-c()
 n_cores <- detectCores() - 1
 n_cores
 
-# we create a cluster (a group of R processes): make 4 of them, their communication type is "SOCK" (compatible with both Windows and Linux, probably MacOS too - don't worry about it). Bonus: skip loading the `methods` package for some extra speed - that's what the third argument is for :)
+# Create a Cluster
 parallelCluster <- makeCluster(n_cores, type = "SOCK", methods = FALSE)
-
-# tell R that we want to use these processes to do calculations
 setDefaultCluster(parallelCluster)
 registerDoParallel(parallelCluster)
 
@@ -218,6 +216,7 @@ listOfRows<- split(Vector_points, (seq(nrow(Vector_points))-1) %/% blocks)
 listOfCin<-  split(WARM_UP, (seq(nrow(WARM_UP))-1) %/% blocks)   
 listofSp<- split(Spin_up, (seq(nrow(Spin_up))-1) %/% blocks) 
   
+# Before continuing check that the lists have the same number of elements than the cores.
 x<-list()
 results<-c()
 system.time({
@@ -407,14 +406,11 @@ results <- foreach(j=1:length(listOfRows),.inorder = FALSE,.combine = rbind,.pac
 }
 
 })
-# tell R that we don't need the processes anymore
+# Stop the clusters
 stopCluster(parallelCluster)
 
 
 WARM_UP<-results
-
-
-
 
 ################for loop ends#############
 
