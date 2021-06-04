@@ -155,20 +155,19 @@ library(doParallel)
 n_cores <- detectCores() - 1
 n_cores
 
-# we create a cluster (a group of R processes): make 4 of them, their communication type is "SOCK" (compatible with both Windows and Linux, probably MacOS too - don't worry about it). Bonus: skip loading the `methods` package for some extra speed - that's what the third argument is for :)
+# we create a cluster
 parallelCluster <- makeCluster(n_cores, type = "SOCK", methods = FALSE)
 
-# tell R that we want to use these processes to do calculations
 setDefaultCluster(parallelCluster)
 registerDoParallel(parallelCluster)
-
-#listOfRows <- split(Vector_variables, sample(1:4, nrow(Vector_variables), replace=T))
 
 blocks<-round(length(Variables)/n_cores)
 
 listOfRows<- split(Variables, (seq(nrow(Variables))-1) %/% blocks) 
 listOfCin<-  split(FOWARD, (seq(nrow(FOWARD))-1) %/% blocks)   
 listOfWup<-  split(WARM_UP, (seq(nrow(WARM_UP))-1) %/% blocks)   
+
+#Check that the  lists have the same number of blocks of the cores that you are going to use. If not reduce the number of cores.
 
 x<-list()
 results<-c()
