@@ -42,6 +42,7 @@ for(i in 1:NROW(SOC_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<0]<-NA
   r[r>800]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
@@ -57,6 +58,7 @@ for(i in 1:NROW(AbsDiff_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<=-80]<-NA
   r[r>=80]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
@@ -72,6 +74,7 @@ for(i in 1:NROW(RelDiff_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<0]<-NA
   r[r>=80]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
@@ -87,6 +90,7 @@ for(i in 1:NROW(ASR_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<=-4]<-NA
   r[r>4]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
@@ -102,6 +106,7 @@ for(i in 1:NROW(RSR_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<0]<-NA
   r[r>4]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
@@ -117,6 +122,7 @@ for(i in 1:NROW(UNC_list)){
   name<-paste0(names(r),'_Corr.tif')
   r[r<0]<-NA
   r[r>200]<-NA
+  r<-mask(r,T0_map)
   plot(r)
   boxplot(values(r))
   boxplot(values(r),outline=FALSE)
