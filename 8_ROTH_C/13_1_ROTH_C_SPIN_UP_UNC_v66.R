@@ -1,40 +1,44 @@
-#12/11/2020
 
 # SPATIAL SOIL R  for VECTORS
-
-###### SPIN UP ################
+#
+# ROTH C phase 1: SPIN UP
 
 # MSc Ing Agr Luciano E Di Paolo
 # Dr Ing Agr Guillermo E Peralta
 # Dr. Ing Rene Dechow
 ################################
 
-################################################################################
-#13_1_ROTHC_C_SPIN_UP_UNC_v66.R
-################################################################################
-# This script does some regionalized uncertainty runs with RothC it quantifies
-# Pool distributions and equilibrium C input for a minimum and maximum scenario
-#Input:
-#   a point.shp file with SOC and un
 
+#13_1_ROTHC_C_SPIN_UP_UNC_v66.R
+
+# This script performs uncertainty runs with RothC and quantifies
+# Pool distributions as well as equilibrium C input for various scenarios
 
 ###################################
 # SOilR from Sierra, C.A., M. Mueller, S.E. Trumbore (2012). 
 #Models of soil organic matter decomposition: the SoilR package, version 1.0 Geoscientific Model Development, 5(4), 
 #1045--1060. URL http://www.geosci-model-dev.net/5/1045/2012/gmd-5-1045-2012.html.
-#####################################
+###################################
 
+#Empty the global environment
 rm(list=ls()) 
 
+#Load packages
 library(SoilR)
 library(raster)
 library(rgdal)
 library(soilassessment)
 
+# Set working directory 
+WD_FOLDER <- "C:/Users/luottoi/Documents/GSOCseq/Module I - Scripts"
+#WD_FOLDER <-"D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020"
+
+setwd(WD_FOLDER)
+
 ########################################################
-# calculates some iom in t / ha
-# input
-# 1. c total carbpn stock in t /ha
+# calculate IOM in t/ha
+# C input
+# total carbon stock in t/ha
 #####################################################
 fIOM.Falloon.RothC =function(c, par1=-1.31, par2=1.139)
 {
@@ -47,6 +51,7 @@ fIOM.Falloon.RothC =function(c, par1=-1.31, par2=1.139)
 #################################################################################
 # fget_equilibrium_fractions.RothC_input 
 # brief: quantifies pool distribution and C input for RothC at equilibrium
+#
 #Input
 # xi= scalar representing an averaged modifying factor
 # C.tot = initial C stock (and C stock in equilibrium)
@@ -119,8 +124,7 @@ fget_equilibrium_fractions.RothC_input=function(xi=1,C.tot,clay, fractI)
   u.bio.rpm=(c.0.1) #66
   u.bio.hum=(c.0.3) #67
   
-  ######################################################################################################
-  ######################################################################################################
+  
   ######################################################################################################
   # HUM pool quantification ( is all C.78)
   ######################################################################################################
@@ -128,10 +132,7 @@ fget_equilibrium_fractions.RothC_input=function(xi=1,C.tot,clay, fractI)
   u.hum.rpm= 1/a.1.2*(-c.0.2*a.1.1-alpha.1)
   u.hum.hum= 1/a.1.2*(-c.0.3*a.1.1)
   
-  ######################################################################################################
-  ######################################################################################################
-  ######################################################################################################
-  ######################################################################################################
+  
   ######################################################################################################
   # DPM C ( is all C.79)
   ######################################################################################################
@@ -139,7 +140,7 @@ fget_equilibrium_fractions.RothC_input=function(xi=1,C.tot,clay, fractI)
   
   #C.dpm=i.dpm * u.dpm.dpm + C0 * s.dpm
   
-  ######################################################################################################
+ 
   ######################################################################################################
   # RPM C ( is all C.80)
   ######################################################################################################
@@ -154,12 +155,12 @@ fget_equilibrium_fractions.RothC_input=function(xi=1,C.tot,clay, fractI)
   u.rpm=u.rpm.rpm+u.bio.rpm+u.hum.rpm
   u.hum=u.bio.hum+u.hum.hum
   
-  Nenner= fractI[1]*u.dpm+fractI[2]*u.rpm+fractI[3]*u.hum
+  denominator= fractI[1]*u.dpm+fractI[2]*u.rpm+fractI[3]*u.hum
   
-  fract.dpm= fractI[1]*u.dpm.dpm/Nenner
-  fract.rpm= fractI[2]*u.rpm.rpm/Nenner
-  fract.bio= (fractI[1]*u.bio.dpm+fractI[2]*u.bio.rpm+fractI[3]*u.bio.hum)/Nenner
-  fract.hum= (fractI[1]*u.hum.dpm+fractI[2]*u.hum.rpm+fractI[3]*u.hum.hum)/Nenner   
+  fract.dpm= fractI[1]*u.dpm.dpm/denominator
+  fract.rpm= fractI[2]*u.rpm.rpm/denominator
+  fract.bio= (fractI[1]*u.bio.dpm+fractI[2]*u.bio.rpm+fractI[3]*u.bio.hum)/denominator
+  fract.hum= (fractI[1]*u.hum.dpm+fractI[2]*u.hum.rpm+fractI[3]*u.hum.hum)/denominator   
   
   fract.all=c(fract.dpm,fract.rpm,fract.bio,fract.hum)
   
@@ -170,28 +171,19 @@ fget_equilibrium_fractions.RothC_input=function(xi=1,C.tot,clay, fractI)
   fract.all=fract.all_stock/C.tot
   fract.all=append(fract.all,IOM/C.tot)
   pools=fract.all*C.tot
-  Cin=(C.tot-pools[5])/Nenner
+  Cin=(C.tot-pools[5])/denominator
   list(pools,Cin)
 }
 
 
-
-
-# Set working directory 
-
-WD_FOLDER=("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020")
-
 # Vector must be an empty points vector. 
+Vector<-readOGR("INPUTS/TARGET_POINTS/target_points.shp")
 
-setwd(WD_FOLDER)
-Vector<-readOGR("INPUTS/TARGET_POINTS/target_points_World_SouthAmerica.shp")
-#Vector2<-readOGR("INPUTS/TARGET_POINTS/Deutschland/target_points.shp")
+
 # Stack_Set_1 is a stack that contains the spatial variables 
-
 Stack_Set_1<- stack("INPUTS/STACK/Stack_Set_SPIN_UP_AOI.tif")
 
 # Create A vector to save the results
-
 C_INPUT_EQ<-Vector
 
 # use this only for backup
@@ -199,8 +191,8 @@ C_INPUT_EQ<-Vector
 # C_INPUT_EQ<-readOGR("OUTPUTS/1_SPIN_UP/SPIN_UP_BSAS_27-03-2020_332376.shp")
 
 # extract variables to points
-
 Vector_variables<-extract(Stack_Set_1,Vector,df=TRUE)
+
 # Extract the layers from the Vector
 
 SOC_im<-Vector_variables[[2]] # primera banda del stack
@@ -273,7 +265,7 @@ Roth_C_equi_analy<-function(Cinputs,Temp,Precip,Evp,Cov2,soil.thick,SOC,clay,DR,
   
   # RUN THE MODEL 
   
-  gummi=fget_equilibrium_fractions.RothC_input(xi=xi,C.tot=SOC,clay=clay, fractI)
+  result=fget_equilibrium_fractions.RothC_input(xi=xi,C.tot=SOC,clay=clay, fractI)
   
   # RUN THE MODEL FROM SOILR
   #Model3_spin=RothCModel(t=years,C0=c(DPMptf, RPMptf, BIOptf, HUMptf, FallIOM),In=Cinputs,DR=DR,clay=clay,xi=xi.frame, pass=TRUE) 
@@ -282,7 +274,7 @@ Roth_C_equi_analy<-function(Cinputs,Temp,Precip,Evp,Cov2,soil.thick,SOC,clay,DR,
   # Get the final pools of the time series
  
   
-  return(gummi)
+  return(result)
 }
 ########## function set up ends###############
 
@@ -355,21 +347,21 @@ for (i in 1:dim(Vector_variables)[1]) {
     
     #Cin.equi$spinup[i]=Ceq;
     
-    gummi=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC,clay,DR,bare1,LU)
-    Ceq = gummi[[2]]
-    pool.equi.mean = gummi[[1]]
+    result=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC,clay,DR,bare1,LU)
+    Ceq = result[[2]]
+    pool.equi.mean = result[[1]]
     
     # UNCERTAINTIES C input equilibrium (MINIMUM)
     
-    gummi=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC_min,clay_min,DR,bare1,LU)
-    Ceq_MIN = gummi[[2]]
-    pool.equi.min = gummi[[1]]
+    result=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC_min,clay_min,DR,bare1,LU)
+    Ceq_MIN = result[[2]]
+    pool.equi.min = result[[1]]
     
     # UNCERTAINTIES C input equilibrium (MAXIMUM)
     
-    gummi=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC_max,clay_max,DR,bare1,LU)
-    Ceq_MAX = gummi[[2]]
-    pool.equi.max = gummi[[1]]
+    result=Roth_C_equi_analy(Cinputs=b,Temp=Temp,Precip=Precip,Evp=Evp,Cov2=Cov2,soil.thick,SOC_max,clay_max,DR,bare1,LU)
+    Ceq_MAX = result[[2]]
+    pool.equi.max = result[[1]]
   
     # SOC POOLS AFTER 500 YEARS RUN WITH C INPUT EQUILIBRIUM
     good_landuse_classes=c(2,12,13,4,3,5,6,8)
@@ -456,6 +448,6 @@ colnames(C_INPUT_EQ@data)[23]="IOM_max"
 
 # SAVE the Points (shapefile)
 
-setwd("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/OUTPUTS/1_SPIN_UP")
-writeOGR(C_INPUT_EQ, ".", "SPIN_UP_County_AOI_World", driver="ESRI Shapefile",overwrite=TRUE) 
+setwd("OUTPUTS/1_SPIN_UP")
+writeOGR(C_INPUT_EQ, ".", "SPIN_UP_AOI", driver="ESRI Shapefile",overwrite=TRUE) 
 
