@@ -215,7 +215,11 @@ blocks<-round(length(Vector_points)/n_cores)
 listOfRows<- split(Vector_points, (seq(nrow(Vector_points))-1) %/% blocks) 
 listOfCin<-  split(WARM_UP, (seq(nrow(WARM_UP))-1) %/% blocks)   
 listofSp<- split(Spin_up, (seq(nrow(Spin_up))-1) %/% blocks) 
-  
+
+listOfRows<-listOfRows[1:n_cores]
+listOfCin<-listOfCin[1:n_cores] 
+listofSp<-listofSp[1:n_cores]
+
 # Before continuing check that the lists have the same number of elements than the cores.
 x<-list()
 results<-c()
