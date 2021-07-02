@@ -5,7 +5,7 @@
 
 #ISRIC DATA
 #https://data.isric.org/geonetwork/srv/spa/catalog.search#/metadata/20f6245e-40bc-4ade-aff3-a87d3e4fcc26
-
+# Changed the number of layers. 
 
 #### Prepare CLAY Layers from ISRIC
 
@@ -30,18 +30,18 @@ setwd(WD_ISRIC)
 Clay1<-raster("CLYPPT_M_sl1_250m_ll.tif")
 Clay2<-raster("CLYPPT_M_sl2_250m_ll.tif")
 Clay3<-raster("CLYPPT_M_sl3_250m_ll.tif")
-Clay4<-raster("CLYPPT_M_sl4_250m_ll.tif")
+
 
 Clay1_AOI<-crop(Clay1,AOI)
 Clay2_AOI<-crop(Clay2,AOI)
 Clay3_AOI<-crop(Clay3,AOI)
-Clay4_AOI<-crop(Clay4,AOI)
+
 
 # Weighted Average of four depths 
 
-WeightedAverage<-function(r1,r2,r3,r4){return(r1*(1/30)+r2*(4/30)+r3*(10/30)+r4*(15/30))}
+WeightedAverage<-function(r1,r2,r3){return(r1*(5/30)+r2*(10/30)+r3*(15/30))}
 
-Clay_WA<-overlay(Clay1_AOI,Clay2_AOI,Clay3_AOI,Clay4_AOI,fun=WeightedAverage)
+Clay_WA<-overlay(Clay1_AOI,Clay2_AOI,Clay3_AOI,fun=WeightedAverage)
 
 Clay_WA_AOI<-mask(Clay_WA,AOI)
 
