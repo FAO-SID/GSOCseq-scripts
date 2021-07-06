@@ -169,7 +169,7 @@ listOfWup<-  split(WARM_UP, (seq(nrow(WARM_UP))-1) %/% blocks)
 
 listOfRows<-listOfRows[1:n_cores]
 listOfCin<-listOfCin[1:n_cores] 
-listofSp<-listofSp[1:n_cores]
+listOfWup<-listOfWup[1:n_cores]
 
 #Check that the  lists have the same number of blocks of the cores that you are going to use. If not reduce the number of cores.
 
