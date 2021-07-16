@@ -1,0 +1,497 @@
+var folder='inputs_NDVI'//change folder
+var country='country'//change 
+var threshold =4000 //NDVI threshold
+var maxpx= 267685348 
+
+
+var ndviVis = {
+  min: 0.0,
+  max: 1.0,
+  palette: [
+    'FFFFFF', 'CE7E45', 'DF923D', 'F1B555', 'FCD163', '99B718', '74A901',
+    '66A000', '529400', '3E8601', '207401', '056201', '004C00', '023B01',
+    '012E01', '011D01', '011301'
+ ],
+};
+
+
+// January
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(1,1,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover01= ndvi_06_nn.divide(ndvi_nn);
+
+
+
+var Recorte = prop_cover01.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_01')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M01', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+//// Febraury
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(2,2,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover02= ndvi_06_nn.divide(ndvi_nn);
+
+
+var Recorte = prop_cover02.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_02')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M02', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+//// March
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(3,3,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover03= ndvi_06_nn.divide(ndvi_nn);
+
+
+var Recorte = prop_cover03.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_03')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M03', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+/// April
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(4,4,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover04= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover04.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_04')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M04', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+/// May
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(5,5,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover05= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover05.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_05')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M05', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+
+// June
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(6,6,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover06= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover06.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_06')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M06', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+// July
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(7,7,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover07= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover07.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_07')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M07', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+// August
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(8,8,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover08= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover08.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_08')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M08', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+// September
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(9,9,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover09= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover09.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_09')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M09', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+
+//  October
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(10,10,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover10= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover10.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_10')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M10', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+// November
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(11,11,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover11= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover11.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_11')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M11', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
+
+/// December
+
+
+
+var dataset = ee.ImageCollection('MODIS/006/MOD13A2')
+                  .filter(ee.Filter.date('2015-01-01', '2020-12-31'))
+                  .filter(ee.Filter.calendarRange(12,12,'month')); // Change number of month<<<<<<<<<<<<<<
+
+var ndvi = dataset.select('NDVI');
+
+
+var mask06= function(image) {
+  
+  var mask = image.select('NDVI').gt(threshold); 
+  
+  return image.updateMask(mask);
+  };
+
+var ndvi_06=ndvi.map(mask06); 
+
+var ndvi_06_nn=ndvi_06.reduce(ee.Reducer.count());
+
+var ndvi_nn=ndvi.reduce(ee.Reducer.count());
+
+var prop_cover12= ndvi_06_nn.divide(ndvi_nn);
+
+var Recorte = prop_cover12.clip(geometry);
+Map.addLayer(Recorte, ndviVis, 'Recorte_CR_12')
+
+
+var regionJSON = JSON.stringify(Recorte.getInfo());
+Export.image.toDrive({
+          image: Recorte.select("NDVI_count"),
+          folder: folder,
+          description: country+'_NDVI_2015-2020_prop_gt04_M12', //change number of month & ndvi <<<<<<<<<<<<<<<<<
+          scale: 1000,
+          region:geometry,
+          maxPixels: maxpx
+          
+});
