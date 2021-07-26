@@ -1,0 +1,118 @@
+// Climate data sets for the Spin Up phase 1980-2001
+// calculate the average temperature from minimum and maximum temperatures
+// download the Minimum and Maximum Temperature 
+// download the Average temperature
+// download the PET 
+// download the Precipitation
+// Not need to scale pet and temperture after this
+
+// http://www.fao.org/global-soil-partnership/en/ 
+//
+//++++++++++++++++++++++++++++++++++++++++++++++//
+
+// Climate data sets from 1981- 2001
+
+// Add your AOI previous to run the script.
+// In case you draw a geometry, change the name of the variable to "table"
+// Area of Interest
+Map.addLayer(geometry, {}, 'Area of interest');
+
+var folder='Terra_Climate' //Create or select the folder in your drive to save the layers
+var aoi='AOI_TEST' // Change the name AOI to your project's name
+var maxpx= 267685348 
+
+////////////////////////////////////////////////
+var dataset = ee.ImageCollection('IDAHO_EPSCOR/TERRACLIMATE')
+                  .filter(ee.Filter.date('1981-01-01', '2001-01-01'))
+
+                  
+var dataset1 = dataset.select('pr','pet');
+
+var dataset2 = dataset1.map(
+  function(img) {
+    var rescaled = img.select('pet')
+                           .multiply(0.1)
+                           .rename('pet_r');
+    return img.addBands(rescaled);
+  }
+);
+
+var dataset2 = dataset2.select('pr','pet_r')
+
+var dataset3=dataset.select('tmmx','tmmn')
+
+var dataset4 = dataset3.map(
+  function(img) {
+    var rescaled = img.select('tmmx')
+                           .multiply(0.1)
+                           .rename('tmmx_r');
+    return img.addBands(rescaled);
+  }
+);
+
+var dataset5 = dataset4.map(
+  function(img) {
+    var rescaled = img.select('tmmn')
+                           .multiply(0.1)
+                           .rename('tmmn_r');
+    return img.addBands(rescaled);
+  }
+);
+
+dataset5 =dataset5.select('tmmx_r','tmmn_r')
+
+var dataset6 = dataset5.map(
+    function (img){
+    return img.addBands (img.expression(
+    'tempAvg=(max+min)/2', {
+      'max': img.select('tmmx_r'),
+      'min': img.select('tmmn_r')}));
+      
+});
+
+
+
+
+var precip=dataset2.select('pr').toBands();
+var evap=dataset2.select('pet_r').toBands();
+var temp=dataset6.select('tempAvg').toBands();
+
+var avT =temp.clip(geometry);
+var pre =precip.clip(geometry);
+var pet =evap.clip(geometry);
+
+Map.addLayer(avT, {}, 'default RGB');
+Map.addLayer(pre, {}, 'default RGB');
+Map.addLayer(pet, {}, 'default RGB');
+
+
+
+var regionJSON = JSON.stringify(avT.getInfo());
+Export.image.toDrive({
+          image: avT,
+          folder: folder,
+          description: aoi+'_AverageTemperature_1981-2001', 
+          scale: 4000,
+          region: geometry
+});
+
+var regionJSON = JSON.stringify(pre.getInfo());
+Export.image.toDrive({
+          image: pre,
+          folder: folder,
+          description: aoi+'_Precipitation_1981-2001', 
+          scale: 4000,
+          region: geometry
+});
+
+var regionJSON = JSON.stringify(pet.getInfo());
+Export.image.toDrive({
+          image: pet,
+          folder: folder,
+          description: aoi+'_PET_1981-2001', 
+          scale: 4000,
+          region: geometry
+});
+
+
+
