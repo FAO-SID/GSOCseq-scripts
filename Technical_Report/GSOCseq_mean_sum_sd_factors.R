@@ -17,9 +17,9 @@ dir = "C:/Users/hp/Documents/FAO/GSOCseq/World_5km"
 files <- list.files(path=dir, pattern ="RSR", full.names=TRUE)
 
 #Define factor layer tile name
-fact = "clim"
+fact = "Lu"
 #output factor tile location
-dir_out_fact = "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_technical_report/data/clim/clim_tiles/"
+dir_out_fact = "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_technical_report/data/LU/LU_tiles/"
 
 #Load packages
 library(raster)
@@ -29,13 +29,9 @@ library(parallel)
 library(doParallel)
 
 
-#Get stats per land use 
-
-#Divide the RSR layer into different tiles. No tiles are actually saved, this allows you to use a tif
+#Divide the GSOCseq layer into different tiles. No tiles are actually saved, this allows you to use a tif
 #file like a database
 
-
-#rsr <- readGDAL("C:/Users/hp/Documents/FAO/GSOCseq/World_1km/WORLD_GSOCseq_RSR_SSM3_Map030_Corr_1km.tif")
 obj <- GDALinfo(files[1])
 
 #Divide raster into tiles
@@ -93,6 +89,8 @@ tiles <- GSIF::getSpatialTiles(obj, block.x=50, return.SpatialPolygons = FALSE)
 # 
 #  stopCluster(cl)
 
+
+#Create a function to get zonal stats per tile
 datalist =list()
 stats_all = list()
 fun_zonal_tiles <- function(i, tiles, dir,fact, threshold=190,files){
@@ -114,34 +112,35 @@ fun_zonal_tiles <- function(i, tiles, dir,fact, threshold=190,files){
                                      ifelse(grepl("BAU",files[j]), "BAU",
                                             ifelse(grepl("_T0",files[j]), "T0","NA" )))))
     
+    #Load factor tile
     lu = raster(paste0(dir_out_fact, fact, i, ".tif"))
-    lu <- as.factor(lu)
+    
+    
     
     #calculate sum,mean and sd
-    stats_mean <- as.data.frame(zonal(x,lu, fun ="mean",na.rm = TRUE))
-    stats_mean$product <- paste0(product, "_", scenario)
-    
+    stats_mean <-ifelse(all(is.na(values(lu))), "No_data", list(zonal(x,lu, fun ="mean",na.rm = TRUE)))
+    stats_mean <- as.data.frame(stats_mean)
     #correct pixel area and ha to km2
     x <- x*area(x)*100
     
     
-    stats_sum <- as.data.frame(zonal(x,lu, fun ="sum",na.rm = TRUE))
-    stats_sum$product <- paste0(product, "_", scenario)
-    
-    
-    
-    stats_sd <- as.data.frame(zonal(x,lu, fun ="sd",na.rm = TRUE))
-    stats_sd$product <- paste0(product, "_", scenario)
-    
+    stats_sum <- ifelse(all(is.na(values(lu))), "No_data", list(zonal(x,lu, fun ="sum",na.rm = TRUE)))
+    stats_sum <- as.data.frame(stats_sum)
+    stats_sd <- ifelse(all(is.na(values(lu))), "No_data", list(zonal(x,lu, fun ="sd",na.rm = TRUE)))
+    stats_sd <- as.data.frame(stats_sd)
     #stats_n <- as.data.frame(zonal(x,lu, fun ="count",na.rm = TRUE))
     
-    stats <- merge(stats_sum,stats_mean, by= c("zone", "product"), all.x= TRUE)
-    stats <- merge(stats,stats_sd, by= c("zone", "product"), all.x= TRUE)
+    stats <- merge(stats_sum,stats_mean, by= c("zone"), all.x= TRUE)
+    
+    stats <-merge(stats,stats_sd, by= c("zone"), all.x= TRUE)
+    
+    stats$product <-paste0(product, "_", scenario)
     #stats <- merge(stats,stats_n, by= "zone", all.x= TRUE)
     
     #write.csv(stats, paste0(dir, "T", i, ".csv"))
     stats_all[[j]] <- stats # add it to your list
     stats <- rbindlist(stats_all)
+    
   }
   datalist[[i]] <- stats
 }
@@ -168,28 +167,12 @@ stopCluster(cl)
 
 
 ## Merge output
-# files <-list.files(path = "C:/Users/hp/Documents/FAO/GSOCseq/World_1km/", pattern = ".csv")
-# 
-# dir <-"C:/Users/hp/Documents/FAO/GSOCseq/World_1km/"
-# 
-# df3 <- df_bind[, lapply(.SD, sum), by = .(zone)]
-# 
-# 
-# 
-# datalist = list()
-# 
-# for (i in files) {
-#     dat <- fread(paste0(dir,i),select = c("zone", "sum"))
-#     
-#     datalist[[i]] <- dat # add it to your list
-# }
-#df_bind <- rbindlist(datalist)
 
 df_bind <- rbindlist(results)
 
 df_bind <- df_bind[df_bind$sum >0,]
 
-#Merge all to one
+
 #Merge all to one
 data <- df_bind[, .(sum=sum(sum),
                     mean=mean(mean),
@@ -197,3 +180,4 @@ data <- df_bind[, .(sum=sum(sum),
 
 write.csv(data, paste0("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_technical_report/data/",
                        fact, "_GSOCseq_stats_allscenarios.csv"))
+
