@@ -49,6 +49,13 @@ PREC<-stack("INPUTS/CRU_LAYERS/Prec_Stack_216_01-18_CRU.tif")
 TEMP<-stack("INPUTS/CRU_LAYERS/Temp_Stack_216_01-18_CRU.tif")
 PET<-stack("INPUTS/CRU_LAYERS/PET_Stack_216_01-18_CRU.tif")
 
+# TERRA CLIMATE LAYERS . Use the layers downloaded from GEE and a scaling factors of 0.1
+#PREC<-stack("INPUTS/TERRA_CLIME/Precipitation_2001-2021_Pergamino.tif")
+#TEMP<-stack("INPUTS/TERRA_CLIME/AverageTemperature_2001-2021_Pergamino.tif")*0.1
+#PET<-stack("INPUTS/TERRA_CLIME/PET_2001-2021_Pergamino.tif")*0.1
+
+
+
 #Open Mean NPP MIAMI 1981 - 2000
 NPP<-raster("INPUTS/NPP/NPP_MIAMI_MEAN_81-00_AOI.tif")
 
