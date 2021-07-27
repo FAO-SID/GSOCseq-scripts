@@ -1,5 +1,12 @@
+### This script opens the dat files and converts to a tif file (mosaic)
+
+## Run this script once for each year and each variable. 
+
+
 library(raster)
 library(rgdal)
+
+
 #remove all variables and make sure you have enough memory.
 #If not try processing less files
 rm(list=ls()) 
