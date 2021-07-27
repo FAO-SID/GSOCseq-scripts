@@ -29,7 +29,7 @@ plot(T0_map)
 
 boxplot(values(T0_map))
 boxplot(values(T0_map),outline=FALSE)
-name=paste0(ISO,'_5km_GSOCseq_T0_Map030')
+name=paste0(ISO,'_GSOCseq_T0_Map030')
 nameOut=paste0(name,'_Corr.tif')
 writeRaster(T0_map,filename=nameOut,format="GTiff")
 
