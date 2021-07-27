@@ -46,6 +46,9 @@ PREC<-stack("INPUTS/TERRA_CLIME/Precipitation_2001-2021_Pergamino.tif")
 TEMP<-stack("INPUTS/TERRA_CLIME/AverageTemperature_2001-2021_Pergamino.tif")*0.1
 PET<-stack("INPUTS/TERRA_CLIME/PET_2001-2021_Pergamino.tif")*0.1
 
+#Also check that the number of layers of DR and Land use are the same as the years of climate data. 
+
+
 #Open Mean NPP MIAMI 1981 - 2000
 
 NPP<-raster("INPUTS/NPP/NPP_MIAMI_MEAN_81-00_AOI.tif")
