@@ -44,7 +44,7 @@ Spin_up<-readOGR("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/OUTPUTS/1_SPIN_U
 
 
 # Open Precipitation , temperature, and Evapotranspiration file 
-# 20 years x 12 = 240 layers x 3
+# 216 layers stack
 PREC<-stack("INPUTS/CRU_LAYERS/Prec_Stack_216_01-18_CRU.tif")
 TEMP<-stack("INPUTS/CRU_LAYERS/Temp_Stack_216_01-18_CRU.tif")
 PET<-stack("INPUTS/CRU_LAYERS/PET_Stack_216_01-18_CRU.tif")

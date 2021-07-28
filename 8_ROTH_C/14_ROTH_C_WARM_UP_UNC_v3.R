@@ -35,7 +35,7 @@ Spin_up<-readOGR("D:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/OUTPUTS/1_SPIN_U
 Spin_up<-as.data.frame(Spin_up)
 
 # Open Precipitation , temperature, and EVapotranspiration file 20 anios x 12 = 240 layers x 3
-
+# 216 layer stack
 # CRU LAYERS
 #PREC<-stack("INPUTS/CRU_LAYERS/Prec_Stack_216_01-18_CRU.tif")
 #TEMP<-stack("INPUTS/CRU_LAYERS/Temp_Stack_216_01-18_CRU.tif")
