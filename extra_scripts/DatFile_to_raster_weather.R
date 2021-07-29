@@ -32,11 +32,11 @@ variable<-'temp_'
 spdf_o_list<-list()
 spdf_centroid_list<-list()
 raster_list<-list()
-year<-testdata[1,2]
-filename<-paste0(variable,'_',year)
 
 for (i in 1:NROW(file_list)){  
 testdata<-read.table(file_list[i],header=FALSE)
+year<-testdata[1,2]
+filename<-paste0(variable,'_',year)
 
 names(testdata)[1]<-'1km_gridCode'
 names(testdata)[2]<-'year'
