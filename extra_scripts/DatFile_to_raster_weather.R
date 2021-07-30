@@ -19,7 +19,7 @@ WD_files<-("C:/Users/lucia/Downloads/JAPAN/weather/1990")
 #precipitation files
 #file_list<-list.files(path=WD_files,pattern=glob2rx(paste0("MSPRM*.dat")),full.names=TRUE)
 
-#temperature files
+# Change this line for temperature or precipitation  files
 file_list<-list.files(path=WD_files,pattern=glob2rx(paste0("MSTMM*.dat")),full.names=TRUE)
 
 #Define the name of the variable
