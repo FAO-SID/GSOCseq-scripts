@@ -19,7 +19,7 @@ WD_files<-("C:/Users/lucia/Downloads/JAPAN/weather/1990")
 #precipitation files
 #file_list<-list.files(path=WD_files,pattern=glob2rx(paste0("MSPRM*.dat")),full.names=TRUE)
 
-#temperature files
+# Change this line for temperature or precipitation  files
 file_list<-list.files(path=WD_files,pattern=glob2rx(paste0("MSTMM*.dat")),full.names=TRUE)
 
 #Define the name of the variable
@@ -32,11 +32,11 @@ variable<-'temp_'
 spdf_o_list<-list()
 spdf_centroid_list<-list()
 raster_list<-list()
-year<-testdata[1,2]
-filename<-paste0(variable,'_',year)
 
 for (i in 1:NROW(file_list)){  
 testdata<-read.table(file_list[i],header=FALSE)
+year<-testdata[1,2]
+filename<-paste0(variable,'_',year)
 
 names(testdata)[1]<-'1km_gridCode'
 names(testdata)[2]<-'year'
