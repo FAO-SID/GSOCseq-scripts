@@ -147,18 +147,24 @@ data = data.frame(x=factor(x,levels=x),measure,text,y)
 fig <- plot_ly(
   data, name = "20", type = "waterfall", measure = ~measure,
   decreasing = list(marker = list(color = "Green")),
-  increasing = (marker = list(color = "red")),
-  totals = list(marker = list(color = "red")),
+  increasing = (marker = list(color = "orange")),
+  totals = list(marker = list(color = "orange")),
   x = ~x, textposition = "outside", y= ~y, text =~text,
   connector = list(line = list(color= "rgb(63, 63, 63)"))) 
 fig <- fig %>%
+  config(displayModeBar = FALSE) %>%
   layout(title = "Potential CO<sub>2</sub> mitigation",
          xaxis = list(title = ""),
          yaxis = list(title = "CO<sub>2</sub>-eq gigagrams yr<sup>-1</sup> "),
          autosize = TRUE,
          showlegend = TRUE)%>% 
   layout(plot_bgcolor='transparent') %>% 
-  layout(paper_bgcolor='transparent')
+  layout(paper_bgcolor='transparent',
+         shapes = list(
+           list(type = "rect",
+                fillcolor = "red", line = list(color = "red"), opacity = 1,
+                x0 = -0.4, x1 = 0.4, xref = "x",
+                y0 = 0.0, y1 = totagrem, yref = "y")))
 
 
 

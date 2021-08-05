@@ -53,24 +53,23 @@ setwd(wd)
 # download_faostat_bulk function
 # after downloading comment lines 56-57
 
-#all_em <- "http://fenixservices.fao.org/faostat/static/bulkdownloads/Emissions_Agriculture_Agriculture_total_E_All_Data.zip"
+#all_em <- "http://fenixservices.fao.org/faostat/static/bulkdownloads/Emissions_Totals_E_All_Data.zip"
 #download_faostat_bulk(all_em, data_folder)
-data <- read_faostat_bulk(paste0(data_folder,"Emissions_Agriculture_Agriculture_total_E_All_Data.zip")) 
+data <- read_faostat_bulk(paste0(data_folder,"Emissions_Totals_E_All_Data.zip")) 
 
 # Extract the most recent year
-data <- data[, c("area_code","area", "item","y2018","element", "unit")]
+data <- data[, c("area_code","area", "item","y2019","element", "unit")]
 
 # Convert FAO country codes to ISO codes
 data$ISO <- countrycode(data$area_code, origin = 'fao', destination = 'iso3c')
-data <- data[data$ISO == ISO & data$item == "Agriculture total",]
+data <- data[data$ISO == ISO & data$item == "Emissions on agricultural land",]
 
 # Extract CO2 equivalent
-data <-data[data$element ==  "Emissions (CO2eq)",]
+data <-data[data$element ==  "Emissions (CO2eq) (AR5)",]
 data <- na.omit(data)
 
 # Calculate total agricultural emissions in Gigagrams
-# this sums total agricultural emissions in CO2 eq and emissions from soils
-totagrem <- round(sum(data$y2018),2)
+totagrem <- data$y2019
 
 # Load Output Maps: Relative Sequestration Rates (SSM-BAU)
 # paste0 will combine the path to the outputs maps contained in
