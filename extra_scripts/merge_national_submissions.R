@@ -45,28 +45,29 @@ gsheet <- gsheet[,c("ISO", "Country",  "National GSOCseq Layers")]
 
 drive_auth(email ="isa.luotto@gmail.com")
 
-# for (i in unique(gsheet$ISO)){
-# setwd(wd)
-# link <- as.character(gsheet[ISO == i, "National GSOCseq Layers"])
-# 
-# dir.create(as.character(gsheet[ISO==i,"ISO"]))
-# 
-# setwd(paste0(wd,"/",as.character(gsheet[ISO==i,"ISO"])))
-# drive_download(link,overwrite = TRUE)
-# 
-# file <- list.files(path=paste0(wd,"/",as.character(gsheet[ISO==i,"ISO"])), pattern =".zip")
-# 
-# 
-# if (is.zip(file)){
-#   unzip(file)
-# 
-# }
-# else{
-# 
-#  print(paste0("Unzip manually ", i))
-# 
-# }}
+for (i in unique(gsheet$ISO)){
+setwd(wd)
+link <- as.character(gsheet[ISO == i, "National GSOCseq Layers"])
 
+dir.create(as.character(gsheet[ISO==i,"ISO"]))
+
+setwd(paste0(wd,"/",as.character(gsheet[ISO==i,"ISO"])))
+drive_download(link,overwrite = TRUE)
+
+file <- list.files(path=paste0(wd,"/",as.character(gsheet[ISO==i,"ISO"])), pattern =".zip")
+
+
+if (is.zip(file)){
+  unzip(file)
+
+}
+else{
+
+ print(paste0("Unzip manually ", i))
+
+}}
+
+setwd("C:/Users/hp/Documents/FAO/GSOCseq/National_submissions")
 # Merge National Submissions
 #Get list of countries
 ISOs <- str_sub(list.dirs(recursive=F),-3,-1)
@@ -92,31 +93,29 @@ outputs<-"C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/
 soc <- raster("C:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/INPUTS/SOC_MAP/GSOCmap_1.6.1.tif")
 
 
-product <-c("*GSOCseq_AbsDiff_BAU_Map030.tif" ,"*GSOCseq_AbsDiff_SSM1_Map030.tif",
-            "*GSOCseq_AbsDiff_SSM2_Map030.tif"    ,    "*GSOCseq_AbsDiff_SSM3_Map030.tif"       
-            ,"*GSOCseq_ASR_BAU_Map030.tif" ,"*GSOCseq_ASR_BAU_UncertaintyMap030.tif"
-            , "*GSOCseq_ASR_SSM1_Map030.tif","*GSOCseq_ASR_SSM1_UncertaintyMap030.tif"
-            , "*GSOCseq_ASR_SSM2_Map030.tif" ,"*GSOCseq_ASR_SSM2_UncertaintyMap030.tif"
-            , "*GSOCseq_ASR_SSM3_Map030.tif"  ,"*GSOCseq_ASR_SSM3_UncertaintyMap030.tif"
-            , "*GSOCseq_BAU_UncertaintyMap030.tif","*GSOCseq_finalSOC_BAU_Map030.tif"
-            , "*GSOCseq_finalSOC_SSM1_Map030.tif"  ,"*GSOCseq_finalSOC_SSM2_Map030.tif"
-            , "*GSOCseq_finalSOC_SSM3_Map030.tif","*GSOCseq_RelDiff_SSM1_Map030.tif"
-            , "*GSOCseq_RelDiff_SSM2_Map030.tif"  ,"*GSOCseq_RelDiff_SSM3_Map030.tif"
-            , "*GSOCseq_RSR_SSM1_Map030.tif","*GSOCseq_RSR_SSM1_UncertaintyMap030.tif"
-            , "*GSOCseq_RSR_SSM2_Map030.tif" ,"*GSOCseq_RSR_SSM2_UncertaintyMap030.tif"
-            , "*GSOCseq_RSR_SSM3_Map030.tif"  ,"*GSOCseq_RSR_SSM3_UncertaintyMap030.tif"
-            , "*GSOCseq_SSM_UncertaintyMap030.tif","*GSOCseq_T0_Map030.tif"
-            , "*GSOCseq_T0_UncertaintyMap030.tif"
+product <-c("*AbsDiff_BAU_Map030" ,"*AbsDiff_SSM1_Map030",
+            "*AbsDiff_SSM2_Map030"    ,    "*AbsDiff_SSM3_Map030"       
+            ,"*ASR_BAU_Map030" ,"*ASR_BAU_UncertaintyMap030"
+            , "*ASR_SSM1_Map030","*ASR_SSM1_UncertaintyMap030"
+            , "*ASR_SSM2_Map030" ,"*ASR_SSM2_UncertaintyMap030"
+            , "*ASR_SSM3_Map030"  ,"*ASR_SSM3_UncertaintyMap030"
+            , "*BAU_UncertaintyMap030","*finalSOC_BAU_Map030"
+            , "*finalSOC_SSM1_Map030"  ,"*finalSOC_SSM2_Map030"
+            , "*finalSOC_SSM3_Map030","*RelDiff_SSM1_Map030"
+            , "*RelDiff_SSM2_Map030"  ,"*RelDiff_SSM3_Map030"
+            , "*RSR_SSM1_Map030","*RSR_SSM1_UncertaintyMap030"
+            , "*RSR_SSM2_Map030" ,"*RSR_SSM2_UncertaintyMap030"
+            , "*RSR_SSM3_Map030"  ,"*RSR_SSM3_UncertaintyMap030"
+            , "*SSM_UncertaintyMap030","*T0_Map030"
+            , "*T0_UncertaintyMap030"
 )
 
 #Loop over each product type
 for(p in product) {
 # Open the t0  raster layer
   setwd(WD_files)
-T0_list<-list.files(pattern=glob2rx(paste0(p)),full.names=TRUE)
+T0_list<-list.files(pattern=p,full.names=TRUE)
 
-#Exclude Senegal for now
-T0_list <- T0_list[-18]
 #Loop to fix layers
 
 R_list<-list()
