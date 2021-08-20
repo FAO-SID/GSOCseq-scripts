@@ -120,7 +120,9 @@ T0_list<-list.files(pattern=p,full.names=TRUE)
 
 R_list<-list()
 for(i in 1:NROW(T0_list)){
-  r<-raster(T0_list[i])
+  r<-raster(str_sub(T0_list[i],3))
+  r[r>800] <-NA
+  r[r<-800] <-NA
  if(as.character(r@crs) !="+proj=longlat +datum=WGS84 +no_defs"){
    wgs ="+proj=longlat +datum=WGS84 +no_defs"
    r <- projectRaster(r,crs=wgs)
@@ -138,11 +140,8 @@ for(i in 1:NROW(T0_list)){
   }
     else{
   
-  #name<-paste0(names(r),'_Corr.tif')
- # r[r<0]<-NA
-  #r[r>800]<-NA
-  
-  writeRaster(r, str_sub(T0_list[i],3), overwrite=TRUE)
+
+ writeRaster(r, str_sub(T0_list[i],3), overwrite=TRUE)
   print(i)
     }
     }
@@ -152,7 +151,7 @@ for(i in 1:NROW(T0_list)){
 
 R_list<-list()
 for(j in 1:NROW(T0_list)){
-  r<-raster(T0_list[j])
+  r<-raster(str_sub(T0_list[j],3))
   #name<-paste0(names(r),'_Corr.tif')
   #plot(r)
   #boxplot(values(r))
