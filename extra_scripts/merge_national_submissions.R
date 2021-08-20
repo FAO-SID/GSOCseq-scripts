@@ -122,7 +122,7 @@ R_list<-list()
 for(i in 1:NROW(T0_list)){
   r<-raster(str_sub(T0_list[i],3))
   r[r>800] <-NA
-  r[r<-800] <-NA
+  r[r< (-800)] <-NA
  if(as.character(r@crs) !="+proj=longlat +datum=WGS84 +no_defs"){
    wgs ="+proj=longlat +datum=WGS84 +no_defs"
    r <- projectRaster(r,crs=wgs)
@@ -140,11 +140,13 @@ for(i in 1:NROW(T0_list)){
   }
     else{
   
-
  writeRaster(r, str_sub(T0_list[i],3), overwrite=TRUE)
+
+    }
+  
+  }
+  writeRaster(r, str_sub(T0_list[i],3), overwrite=TRUE)
   print(i)
-    }
-    }
   }
 
 
@@ -163,6 +165,6 @@ for(j in 1:NROW(T0_list)){
 Mos<-do.call(mosaic,c(R_list,fun=mean,tolerance=0.5))#11,19
 
 setwd(outputs)
-writeRaster(Mos,filename=paste0("GSOCseq_",str_sub(p,2)),format='GTiff', overwrite=TRUE)
+writeRaster(Mos,filename=paste0("GSOCseq_",gsub("*\\*", "", p)),format='GTiff', overwrite=TRUE)
 
 }
