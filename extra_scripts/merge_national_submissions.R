@@ -74,7 +74,7 @@ ISOs <- str_sub(list.dirs(recursive=F),-3,-1)
 
 
 for (i in unique(ISOs)){
-  files <- list.files(path=paste0(wd,"/",as.character(gsheet[ISO==i,"ISO"])), pattern =".tif"
+  files <- list.files(path=paste0(wd,"/",i), pattern =".tif"
                       ,full.names = TRUE)
   GSOCseq <-"C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/"
 
@@ -93,21 +93,21 @@ outputs<-"C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/
 soc <- raster("C:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/INPUTS/SOC_MAP/GSOCmap_1.6.1.tif")
 
 
-product <-c("*AbsDiff_BAU_Map030" ,"*AbsDiff_SSM1_Map030",
-            "*AbsDiff_SSM2_Map030"    ,    "*AbsDiff_SSM3_Map030"       
-            ,"*ASR_BAU_Map030" ,"*ASR_BAU_UncertaintyMap030"
-            , "*ASR_SSM1_Map030","*ASR_SSM1_UncertaintyMap030"
-            , "*ASR_SSM2_Map030" ,"*ASR_SSM2_UncertaintyMap030"
-            , "*ASR_SSM3_Map030"  ,"*ASR_SSM3_UncertaintyMap030"
-            , "*BAU_UncertaintyMap030","*finalSOC_BAU_Map030"
-            , "*finalSOC_SSM1_Map030"  ,"*finalSOC_SSM2_Map030"
-            , "*finalSOC_SSM3_Map030","*RelDiff_SSM1_Map030"
-            , "*RelDiff_SSM2_Map030"  ,"*RelDiff_SSM3_Map030"
-            , "*RSR_SSM1_Map030","*RSR_SSM1_UncertaintyMap030"
-            , "*RSR_SSM2_Map030" ,"*RSR_SSM2_UncertaintyMap030"
-            , "*RSR_SSM3_Map030"  ,"*RSR_SSM3_UncertaintyMap030"
-            , "*SSM_UncertaintyMap030","*T0_Map030"
-            , "*T0_UncertaintyMap030"
+product <-c("*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map030*",
+            "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"       
+            ,"*ASR_BAU_Map030*" ,"*ASR_BAU_UncertaintyMap030*"
+            , "*ASR_SSM1_Map030*","*ASR_SSM1_UncertaintyMap030*"
+            , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_UncertaintyMap030*"
+            , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_UncertaintyMap030*"
+            , "*BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
+            , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
+            , "*finalSOC_SSM3_Map030*","*RelDiff_SSM1_Map030*"
+            , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
+            , "*RSR_SSM1_Map030*","*RSR_SSM1_UncertaintyMap030*"
+            , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_UncertaintyMap030*"
+            , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_UncertaintyMap030*"
+            , "*SSM_UncertaintyMap030*","*T0_Map030*"
+            , "*T0_UncertaintyMap030*"
 )
 
 #Loop over each product type
@@ -139,8 +139,8 @@ for(i in 1:NROW(T0_list)){
     else{
   
   #name<-paste0(names(r),'_Corr.tif')
-  r[r<0]<-NA
-  r[r>800]<-NA
+ # r[r<0]<-NA
+  #r[r>800]<-NA
   
   writeRaster(r, str_sub(T0_list[i],3), overwrite=TRUE)
   print(i)
