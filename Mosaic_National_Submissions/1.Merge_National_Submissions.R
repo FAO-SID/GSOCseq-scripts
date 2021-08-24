@@ -116,18 +116,19 @@ soc <- raster("C:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/INPUTS/SOC_MAP/GSOC
 
 #Product list
  product <-c(
-"*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
-            "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
-            ,"*ASR_BAU_Map030*" ,"*ASR_BAU_UncertaintyMap030*"
-            , "*ASR_SSM1_Map030*","*ASR_SSM1_UncertaintyMap030*"
-            , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_UncertaintyMap030*"
-            , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_UncertaintyMap030*"
-            , "*ASR_BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
-            , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
-            , "*finalSOC_SSM3_Map030*",
-            "*RelDiff_SSM1_Map030*"
-            , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
-            , "*RSR_SSM1_Map030*","*RSR_SSM1_Unce*"
+# "*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
+#             "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
+#             ,"*ASR_BAU_Map030*" ,"*ASR_BAU_UncertaintyMap030*"
+#             , "*ASR_SSM1_Map030*","*ASR_SSM1_UncertaintyMap030*"
+#             , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_UncertaintyMap030*"
+#             , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_UncertaintyMap030*"
+#             , "*ASR_BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
+#             , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
+#             , "*finalSOC_SSM3_Map030*",
+#             "*RelDiff_SSM1_Map030*"
+#             , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
+#             , "*RSR_SSM1_Map030*",
+   "*RSR_SSM1_Unce*"
             , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_Unce*"
             , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_Unce*"
             , "*SSM_UncertaintyMap030*","*T0_Map030*"
@@ -144,7 +145,6 @@ for(p in product) {
     print(paste("Check:", p,length(sub_list) ))
     
   }
-  
   
 }
  
@@ -175,7 +175,7 @@ for(i in 1:NROW(T0_list)){
   } else if (grepl("RelDiff",p)) {
     r[r<=0]<-NA
     r[r>=80]<-NA
-  } else  if(grepl("Uncer",p)) {
+  } else  if(grepl("Unce",p)) {
     r[r<0]<-NA
     r[r>200]<-NA  }
   
