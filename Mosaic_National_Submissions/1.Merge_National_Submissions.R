@@ -116,24 +116,39 @@ soc <- raster("C:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/INPUTS/SOC_MAP/GSOC
 
 #Product list
  product <-c(
-"*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map030*",
+"*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
             "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
             ,"*ASR_BAU_Map030*" ,"*ASR_BAU_UncertaintyMap030*"
             , "*ASR_SSM1_Map030*","*ASR_SSM1_UncertaintyMap030*"
             , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_UncertaintyMap030*"
             , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_UncertaintyMap030*"
-            , "*BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
+            , "*ASR_BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
             , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
             , "*finalSOC_SSM3_Map030*",
             "*RelDiff_SSM1_Map030*"
             , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
-            , "*RSR_SSM1_Map030*","*RSR_SSM1_UncertaintyMap030*"
-            , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_UncertaintyMap030*"
-            , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_UncertaintyMap030*"
+            , "*RSR_SSM1_Map030*","*RSR_SSM1_Unce*"
+            , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_Unce*"
+            , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_Unce*"
             , "*SSM_UncertaintyMap030*","*T0_Map030*"
             , "*T0_UncertaintyMap030*"
 )
+ 
+#Check that all layers get picked up 
+ #Number of submissions
+num_sub <- length(unique(gsheet$ISO)) -1#(-USA)
+for(p in product) {
 
+  sub_list<-list.files(pattern=p,full.names=TRUE)
+  if(length(sub_list)!=num_sub){
+    print(paste("Check:", p,length(sub_list) ))
+    
+  }
+  
+  
+}
+ 
+ 
 #Loop over each product type
 for(p in product) {
 # Open the t0  raster layer
