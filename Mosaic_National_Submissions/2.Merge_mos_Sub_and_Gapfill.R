@@ -187,12 +187,10 @@ for (i in 1:length(subs)){
 }
 
 #Fix and merge all layers with the gap-fill layer
-gapfill_dir <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_Results_data/GSOCseq/WORLD_GSOCseq_AbsDiff_BAU_Map030_Corr_1km_t0mask_incmask.tif"
-sub_dir <- "C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/combined"
 
 
 #Merge Uncertainties
-products <-c("*Uncer*")
+products <-c("*Unce*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
 
