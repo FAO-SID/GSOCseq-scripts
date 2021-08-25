@@ -137,7 +137,7 @@ for (i in unique(ISOs)){
               copy.mode = TRUE)
   }
 
-}}
+}
 
 WD_files<-"C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/"
 setwd(WD_files)
