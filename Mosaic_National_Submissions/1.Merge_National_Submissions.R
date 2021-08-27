@@ -92,9 +92,9 @@ product <-c(
   "*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
   "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
   ,"*ASR_BAU_Map030*" ,
-  "*ASR_SSM1_Map030*","*ASR_SSM1_UncertaintyMap030*"
-  , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_UncertaintyMap030*"
-  , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_UncertaintyMap030*"
+  "*ASR_SSM1_Map030*","*ASR_SSM1_Unce*"
+  , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_Unce*"
+  , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_Unce*"
   , "*ASR_BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
   , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
   , "*finalSOC_SSM3_Map030*",
@@ -105,14 +105,15 @@ product <-c(
   , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_Unce*"
   , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_Unce*"
   , "*SSM_UncertaintyMap030*","*T0_Map030*"
-  , "*T0_UncertaintyMap030*"
+  , "*T0_UncertaintyMap030*",
+  "*GSOCseq_BAU_UncertaintyMap030*"
 )
 
 
 for (i in unique(ISOs)){
   
   files <- list.files(path=paste0(wd,"/",i), pattern =".tif"
-                      ,full.names = TRUE,recursive=F)
+                      ,full.names = TRUE,recursive=T)
   files <-files[!grepl(".aux", files)|!grepl(".ovr", files)]
   for (p in unique(product)){
     
@@ -125,7 +126,7 @@ for (i in unique(ISOs)){
 
   file.copy(from=files,
             to=GSOCseq,
-            overwrite = TRUE, recursive = FALSE,
+            overwrite = TRUE, recursive = TRUE,
             copy.mode = TRUE)}
   else{
     print(paste("Check", i))
@@ -152,6 +153,19 @@ outputs<-"C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/
 #Load SOC map as reference layer
 soc <- raster("C:/TRAINING_MATERIALS_GSOCseq_MAPS_12-11-2020/INPUTS/SOC_MAP/GSOCmap_1.6.1.tif")
 
+# #Mask Russia to UN boarders (ZAF already submitted map without LSO)  
+# library(terra)
+# RUS <-list.files(pattern="RUS",full.names=TRUE)
+# map <- vect("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/RUS.shp")
+# map <- rasterize(map, rast(RUS[20]))
+# 
+# for (i in 1:length(RUS)){
+#   rus <- rast(RUS[i])
+#   rus <- mask(rus,map)
+#   writeRaster(rus,RUS[i], overwrite=T)
+#   print(paste("Cropped",RUS[i],i))
+# }
+# detach("package:terra", unload=TRUE)
 
 #Check that all layers get picked up 
  #Number of submissions
@@ -175,7 +189,6 @@ T0_list<-list.files(pattern=p,full.names=TRUE)
 
 #Loop to fix layers
 
-R_list<-list()
 for(i in 1:NROW(T0_list)){
   r<-raster(str_sub(T0_list[i],3))
   if(grepl("AbsDiff",p)) {
@@ -230,6 +243,7 @@ for(j in 1:NROW(T0_list)){
   r<-raster(str_sub(T0_list[j],3))
   R_list[[j]]<-r
 }
+
 
 Mos<-do.call(mosaic,c(R_list,fun=mean,tolerance=0.5))#11,19
 

@@ -32,7 +32,7 @@ blanks <- c("AUS","AUT","BEL",
             "LVA","NLD","NZL","NOR", "ITA")
 
 
-# download National Submissions
+# check number of submissions
 sheet_url <- "https://docs.google.com/spreadsheets/d/1B9qukBJehe7p0T4TkwR8A4tUMLs8LkP5m6nlM9ae4ZM/edit#gid=2110860500"
 ##sheet of interest for the map
 gs4_deauth()
@@ -46,56 +46,57 @@ gsheet$date <- as.Date(gsheet$date)
 gsheet <-gsheet[, c("ISO", "Country") := tstrsplit(Country, "; ", fixed=TRUE)]
 
 #Select unique ISOs
-gsheet  <- gsheet[!duplicated(gsheet$ISO),]
-
+gsheet  <- gsheet[!duplicated(gsheet$ISO),"ISO"]
+gsheet <-gsheet[gsheet$ISO!="USA",]
 exclude <- c(blanks, gsheet$ISO)
 
-#Load UN country boarders (can be found on gdrive)
-map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
-map <-  map[!(map$ISO3CD %in% exclude),]
-
-#Create a spatraster to use as a mask layer 
-map <- vect(map)
-
-#Gapfill layer files
-GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=T)
-
-g <-rast(GAPS[1])
-map <- rasterize(map, g)
-
-#Update date in the name
-writeRaster(map, "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif", overwrite=TRUE)
-#map <-rast("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif")
-GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=F)
-
-#Mask all gap-fill layers
-for (i in 1:length(GAPS)){
-  g <-rast(paste0(gapfill_dir, GAPS[i]))
-  g <- mask(g, map)
-
-  writeRaster(g, paste0(mask_gap_dir, GAPS[i]),overwrite=TRUE)
-  print(paste("Masked:",GAPS[i]))
-}
+# #Load UN country boarders (can be found on gdrive)
+# map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
+# map <-  map[!(map$ISO3CD %in% exclude),]
+# 
+# #Create a spatraster to use as a mask layer 
+# map <- vect(map)
+# 
+# #Gapfill layer files
+# GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=T)
+# 
+# g <-rast(GAPS[1])
+# map <- rasterize(map, g)
+# 
+# #Update date in the name
+# writeRaster(map, "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif", overwrite=TRUE)
+# #map <-rast("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif")
+# GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=F)
+# 
+# #Mask all gap-fill layers
+# for (i in 1:length(GAPS)){
+#   g <-rast(paste0(gapfill_dir, GAPS[i]))
+#   g <- mask(g, map)
+# 
+#   writeRaster(g, paste0(mask_gap_dir, GAPS[i]),overwrite=TRUE)
+#   print(paste("Masked:",GAPS[i]))
+# }
 
 
 
 ## Absdiff
 products <-c("*AbsDiff_*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
+subs <-subs[!grepl("Unc",subs)]
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
+gaps <-gaps[!grepl("Unc",gaps)]
 for (i in 1:length(subs)){
   s <- raster(paste0(sub_dir,subs[i]))
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
+              NAflag=-999,overwrite=TRUE)
  
   
 }
 
 # T0
-products <-c("*GSOCseq_T0_Map030*")
+products <-c("*T0_Map030*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
 
@@ -104,7 +105,7 @@ for (i in 1:length(subs)){
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
+              NAflag=-999,overwrite=TRUE)
   
 }
 
@@ -112,46 +113,34 @@ for (i in 1:length(subs)){
 #Final BAU SOC
 products <-c("*GSOCseq_finalSOC*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
+subs <-subs[!grepl("Unc",subs)]
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
+gaps <-gaps[!grepl("Unc",gaps)]
 for (i in 1:length(subs)){
   s <- raster(paste0(sub_dir,subs[i]))
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE) 
+              NAflag=-999,overwrite=TRUE) 
   
 }
 
 
-
-#Merge Absolute Differences BAU raster layers.
-products <-c("*GSOCseq_AbsDiff*")
-subs <- list.files(path= sub_dir,pattern=products,full.names=F)
-gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
-for (i in 1:length(subs)){
-  s <- raster(paste0(sub_dir,subs[i]))
-  g <-raster(paste0(mask_gap_dir,gaps[i]))
-  mos <- merge(s,g)
-  writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
-  
-}
 
 
 
 #Merge Relative Differences SSM1 raster layers.
 products <-c("*GSOCseq_RelDiff*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
+subs <-subs[!grepl("Unc",subs)]
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
+gaps <-gaps[!grepl("Unc",gaps)]
 for (i in 1:length(subs)){
   s <- raster(paste0(sub_dir,subs[i]))
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
+              NAflag=-999,overwrite=TRUE)
   
 }
 
@@ -160,14 +149,15 @@ for (i in 1:length(subs)){
 #Merge Absolute sequestration 
 products <-c("*GSOCseq_ASR*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
+subs <-subs[!grepl("Unc",subs)]
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
+gaps <-gaps[!grepl("Unc",gaps)]
 for (i in 1:length(subs)){
   s <- raster(paste0(sub_dir,subs[i]))
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
+              NAflag=-999,overwrite=TRUE)
   
 }
 
@@ -175,20 +165,19 @@ for (i in 1:length(subs)){
 #Merge Relative sequestration Rates SSM1 raster layers.
 products <-c("*GSOCseq_RSR*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
+subs <-subs[!grepl("Unc",subs)]
 gaps <- list.files(path= mask_gap_dir,pattern=products,full.names=F)
-
+gaps <-gaps[!grepl("Unc",gaps)]
 for (i in 1:length(subs)){
   s <- raster(paste0(sub_dir,subs[i]))
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE)
+              NAflag=-999,overwrite=TRUE)
   
 }
 
 #Fix and merge all layers with the gap-fill layer
-
-
 #Merge Uncertainties
 products <-c("*Unce*")
 subs <- list.files(path= sub_dir,pattern=products,full.names=F)
@@ -199,9 +188,10 @@ for (i in 1:length(subs)){
   g <-raster(paste0(mask_gap_dir,gaps[i]))
   mos <- merge(s,g)
   writeRaster(mos,paste0(out_sub_gap, subs[i]),format="GTiff",
-              NAflag=-999,options=c("COMPRESS=DEFLATE","PREDICTOR=2","ZLEVEL=9"),overwrite=TRUE) 
+              NAflag=-999,overwrite=TRUE) 
   
 }
+
 
 
 
