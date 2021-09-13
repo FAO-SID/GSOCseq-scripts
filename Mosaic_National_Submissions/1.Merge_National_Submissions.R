@@ -49,6 +49,8 @@ gseqv_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/sub_and_gap"
 #Output folder for the new version
 GSOCseq_output_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0"
 outputs<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs/intermediate/combined"
+#Set the working directory to the files were the intermediate layers will be stored
+interm_dir<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs/intermediate"
 #Function to check if it's a zipped file
 is.zip <- function(filepath){
   result <- tryCatch({
@@ -182,8 +184,7 @@ for (i in unique(ISOs)){
 ##2.4)mosaic layers 
 ##2.5)save intermediate update layers
 
-#Set the working directory to the files were the intermediate layers will be stored
-interm_dir<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs/intermediate"
+
 setwd(interm_dir)
 
 # Fix and combine layers
