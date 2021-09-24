@@ -44,7 +44,7 @@ library(stringr)
 wd <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs"
 setwd(wd)
 #Folder where the latest GSOCseq layers are located
-gseqv_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/sub_and_gap"
+gseqv_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0"
 
 #Output folder for the new version
 GSOCseq_output_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0"
@@ -71,7 +71,6 @@ is.zip <- function(filepath){
 log <- fread('2021-08-26_GSOCseq_log.csv')
 date_log <-gsub("/", "-", log$Date)
 
-
 #Read Submission overview google sheet
 sheet_url <- "https://docs.google.com/spreadsheets/d/1B9qukBJehe7p0T4TkwR8A4tUMLs8LkP5m6nlM9ae4ZM/edit#gid=2110860500"
 gs4_deauth()
@@ -87,7 +86,7 @@ gsheet <-unique(gsheet[order(date)], by="ISO", fromLast=TRUE)
 gsheet <- gsheet[,c('date',"ISO", "Country",  "National GSOCseq Layers")]
 
 # To update the GSOCseq select only countries after the last log date
-gsheet <-with(gsheet, gsheet[(date >=date_log), ])
+gsheet <-with(gsheet, gsheet[(date >date_log), ])
 
 
 ##1.2) Download and unzip layers
@@ -119,8 +118,7 @@ else{
 setwd("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs")
 
 #Get list of countries
-ISOs <- str_sub(list.dirs(recursive=F),-3,-1)
-ISOs <-ISOs[ISOs!='ate']
+ISOs <- gsheet$ISO
 #Product list
 product <-c(
   "*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
@@ -180,7 +178,7 @@ for (i in unique(ISOs)){
 # 2) Generate mosaic of the submitted layers
 ##2.1)Fix projection 
 ##2.2)resolution
-##2.3) Mask out of range values
+##2.3) Mask out of range values (including 0)
 ##2.4)mosaic layers 
 ##2.5)save intermediate update layers
 
@@ -214,6 +212,10 @@ T0_list<-list.files(pattern=p,full.names=TRUE)
 
 for(i in 1:NROW(T0_list)){
   r<-raster(str_sub(T0_list[i],3))
+  
+  #0 as NA
+  r[r==0.0000] <-NA
+  
   if(grepl("AbsDiff",p)) {
     r[r>=80] <-NA
     r[r<=(-80)] <-NA
@@ -268,7 +270,7 @@ for(j in 1:NROW(T0_list)){
 }
 
 
-Mos<-do.call(mosaic,c(R_list,fun=mean,tolerance=0.5))#11,19
+Mos<-do.call(mosaic,c(R_list,fun=mean,tolerance=0.5))
 
 setwd(outputs)
 writeRaster(Mos,filename=paste0("GSOCseq_",gsub("*\\*", "", p)),format='GTiff', overwrite=TRUE)
@@ -284,24 +286,29 @@ writeRaster(Mos,filename=paste0("GSOCseq_",gsub("*\\*", "", p)),format='GTiff', 
 library(terra)
 
 map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
-map <- vect(map[map$ISO3CD %in%ISOs,])
-
+map <- map[map$ISO3CD %in%ISOs,]
+map<-vect(map)
 
 ##3.2) Mask GSOCseq layers
 
 #list GSOCseq layers from the previous version
 gseqv <- list.files(path=gseqv_dir, pattern =".tif",full.names=T)
+intermd<- list.files(path= outputs,pattern=".tif",full.names=T)
 
-g <-rast(gseqv[1])
+g <-rast(gseqv[6])
 map <- rasterize(map, g)
 
 for (i in 1:length(gseqv)){
   g <-rast(gseqv[i])
   g <- mask(g, map,inverse=T)
+  
+  
   print(paste("Masked",i))
 
+  g[g==0.0000] <-NA
+  
   filename <- sub('.*/', '', gseqv[i])
-  writeRaster(g, paste0(GSOCseq_output_dir, '/',filename),overwrite=TRUE)
+  writeRaster(g, paste0(GSOCseq_output_dir, '/',filename),overwrite=TRUE,NAflag=-999)
   print(paste(filename,i))
   
 }
@@ -309,7 +316,7 @@ for (i in 1:length(gseqv)){
 
 ##3.3) Mosaic GSOCseq layers with intermediate maps
 ##3.4) Save new GSOCseq layers and overwrite intermediate layers
-intermd<- list.files(path= outputs,pattern=".tif",full.names=T)
+
 gseqv <- list.files(path=gseqv_dir, pattern =".tif",full.names=T)
 
 for (i in 1:length(gseqv)){
@@ -329,12 +336,11 @@ ts <- Sys.time()
 date <-format(Sys.Date(),"%m-%d-%Y")
 #get countries that were updated 
 ISOs <- as.data.frame(gsheet$ISO)
-ISOs <- as.data.frame(ISOs[1:50,])
 colnames(ISOs)<-'ISO'
 ISOs <-ISOs %>%
   dplyr::summarise(ISO = paste(ISO, collapse = ","))
 #Comments
-comments <- "The GSOCseq v1.0.0 is launched."
+comments <- "Updated to GSOCseq_V1.0.1"
 
 #Get table
 table  <- data.frame(Date=date,Timestamp=ts, Countries=ISOs, Comments=comments)
