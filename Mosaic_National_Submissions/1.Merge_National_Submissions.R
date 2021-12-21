@@ -44,10 +44,10 @@ library(stringr)
 wd <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs"
 setwd(wd)
 #Folder where the latest GSOCseq layers are located
-gseqv_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0"
+gseqv_dir<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/GapFill_220821/"
 
 #Output folder for the new version
-GSOCseq_output_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0"
+GSOCseq_output_dir <-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.1"
 outputs<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs/intermediate/combined"
 #Set the working directory to the files were the intermediate layers will be stored
 interm_dir<-"C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs/intermediate"
@@ -68,7 +68,7 @@ is.zip <- function(filepath){
 ## 1.1) Select gdrive download links based on latest submission and log date
 
 #Read log file to select only layers after a certain timestamp 
-log <- fread('2021-08-26_GSOCseq_log.csv')
+log <- fread('09-20-2021_GSOCseq_log.csv')
 date_log <-gsub("/", "-", log$Date)
 
 #Read Submission overview google sheet
@@ -121,23 +121,28 @@ setwd("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_mosaic_subs")
 ISOs <- gsheet$ISO
 #Product list
 product <-c(
-  "*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
-  "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
-  ,"*ASR_BAU_Map030*" ,
-  "*ASR_SSM1_Map030*","*ASR_SSM1_Unce*"
-  , "*ASR_SSM2_Map030*" ,"*ASR_SSM2_Unce*"
-  , "*ASR_SSM3_Map030*"  ,"*ASR_SSM3_Unce*"
-  , "*ASR_BAU_UncertaintyMap030*","*finalSOC_BAU_Map030*"
-  , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
-  , "*finalSOC_SSM3_Map030*",
-  "*RelDiff_SSM1_Map030*"
-  , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
-  , "*RSR_SSM1_Map030*",
-  "*RSR_SSM1_Unce*"
-  , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_Unce*"
-  , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_Unce*"
-  , "*SSM_UncertaintyMap030*","*T0_Map030*"
-  , "*T0_UncertaintyMap030*",
+  # "*AbsDiff_BAU_Map030*" ,"*AbsDiff_SSM1_Map*",
+  # "*AbsDiff_SSM2_Map030*"    ,    "*AbsDiff_SSM3_Map030*"
+  # ,"*ASR_BAU_Map030*" ,
+  # "*ASR_SSM1_Map030*",
+  "*ASR_SSM1_Unce*",
+  #, "*ASR_SSM2_Map030*" ,
+  "*ASR_SSM2_Unce*",
+  #, "*ASR_SSM3_Map030*"  ,
+  "*ASR_SSM3_Unce*",
+   "*ASR_BAU_UncertaintyMap030*",
+  # "*finalSOC_BAU_Map030*"
+  # , "*finalSOC_SSM1_Map030*"  ,"*finalSOC_SSM2_Map030*"
+  # , "*finalSOC_SSM3_Map030*",
+  # "*RelDiff_SSM1_Map030*"
+  # , "*RelDiff_SSM2_Map030*"  ,"*RelDiff_SSM3_Map030*"
+  # , "*RSR_SSM1_Map030*",
+  # "*RSR_SSM1_Unce*"
+  # , "*RSR_SSM2_Map030*" ,"*RSR_SSM2_Unce*"
+  # , "*RSR_SSM3_Map030*"  ,"*RSR_SSM3_Unce*"
+  "*SSM_UncertaintyMap030*",
+  #"*T0_Map030*"
+   "*T0_UncertaintyMap030*",
   "*GSOCseq_BAU_UncertaintyMap030*"
 )
 
@@ -284,22 +289,41 @@ writeRaster(Mos,filename=paste0("GSOCseq_",gsub("*\\*", "", p)),format='GTiff', 
 #Mask previous GSOCseq version
 #Load UN country boarders (can be found on gdrive)
 library(terra)
+# Fix extents
+#list GSOCseq layers from the previous version
+gseqv <- list.files(path=gseqv_dir, pattern ="_Unce.",full.names=T)
+#gseqv<- gseqv[6:8] 
+
+t0 <-raster(gseqv[1])
+
+for (i in 1:length(gseqv)){
+  g <-raster(gseqv[i])
+  g <- resample(g, t0)
+
+  
+  filename <- sub('.*/', '', gseqv[i])
+  writeRaster(g, paste0(GSOCseq_output_dir, '/',filename),overwrite=TRUE,NAflag=-999)
+  print(paste(filename,i))
+  
+}
+
+
 
 map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
 map <- map[map$ISO3CD %in%ISOs,]
+
 map<-vect(map)
-
-##3.2) Mask GSOCseq layers
-
-#list GSOCseq layers from the previous version
-gseqv <- list.files(path=gseqv_dir, pattern =".tif",full.names=T)
 intermd<- list.files(path= outputs,pattern=".tif",full.names=T)
+gseqv <- list.files(path=GSOCseq_output_dir, pattern ="Unc",full.names=T)
+gseqv <- gseqv[!grepl("RSR",gseqv)]
+##3.2) Mask GSOCseq layers
+g <-rast(gseqv[1])
 
-g <-rast(gseqv[6])
 map <- rasterize(map, g)
-
+map <- raster(map) 
 for (i in 1:length(gseqv)){
-  g <-rast(gseqv[i])
+  g <-raster(gseqv[i])
+  
   g <- mask(g, map,inverse=T)
   
   
@@ -312,23 +336,38 @@ for (i in 1:length(gseqv)){
   print(paste(filename,i))
   
 }
+
 #Better restart R at this point if the terra package causes problems
 
 ##3.3) Mosaic GSOCseq layers with intermediate maps
 ##3.4) Save new GSOCseq layers and overwrite intermediate layers
 
-gseqv <- list.files(path=gseqv_dir, pattern =".tif",full.names=T)
+gseqv <- list.files(path=GSOCseq_output_dir, pattern ="Unce.",full.names=T)
 
 for (i in 1:length(gseqv)){
   g <-raster(gseqv[i])
   intm <- raster(intermd[i])
- mos <- merge(g,intm)
+
+  mos <- merge(intm,g,tolerance = 0.5)
+
+ 
  
   filename <- sub('.*/', '', gseqv[i])
   writeRaster(mos, paste0(GSOCseq_output_dir, '/',filename),overwrite=TRUE, NAflag=-999)
   print(paste(filename,i))
 }
 
+r <-raster(gseqv[28])
+for (i in 23:length(gseqv)){
+  g <-raster(gseqv[i])
+ extent(g) <-extent(r)
+  
+  
+  
+  filename <- sub('.*/', '', gseqv[i])
+  writeRaster(g, paste0(GSOCseq_output_dir, '/ext/',filename),overwrite=TRUE, NAflag=-999)
+  print(paste(filename,i))
+}
 
 ##3.5) Generate change log
 #get date and time
@@ -340,9 +379,9 @@ colnames(ISOs)<-'ISO'
 ISOs <-ISOs %>%
   dplyr::summarise(ISO = paste(ISO, collapse = ","))
 #Comments
-comments <- "Updated to GSOCseq_V1.0.1"
+comments <- "Updated to GSOCseq_V1..1"
 
-#Get table
+#Get table0
 table  <- data.frame(Date=date,Timestamp=ts, Countries=ISOs, Comments=comments)
 
 #Save log file 

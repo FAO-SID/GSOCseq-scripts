@@ -16,18 +16,18 @@ library(sp)
 # User defined variables
 
 ## Working directory (wd). It should end with a "/"
-wd <- "C:/Users/hp/Documents/FAO/GSOCseq/"
+wd <- "C:/Users/hp/Documents/FAO/GSOCseq/Joint Maps/NENA/"
 #wd <- "C:/Users/luottoi/Documents/GSOCseq/"
 
 
 ## GSOCseq output maps directory. The paste0 function will combine
 ## your working directory wd with the folder name that contains
 ## your output maps
-GSOCseq_folder <- paste0(wd,"Argentina/")
+GSOCseq_folder <- paste0(wd,"SDN/")
 
 
 ## Country of interest (specified by the 3-digit ISO code)
-ISO <- "ARG"
+ISO <- "SDN"
 
 
 # Set the working directory
@@ -35,7 +35,7 @@ setwd(wd)
 
 #Load land use map ESA (the same one used for the modeling exercise)
 
-lu <- raster("Argentina/ESA_Land_Cover_12clases_FAO_AOI.tif")
+lu <- raster("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_Results_data/LU/ESA_Land_Cover_12clases_FAO_World_2015_1km.tif")
 
 
 # Load Output Maps: Relative Sequestration Rates (SSM-BAU)
@@ -49,7 +49,9 @@ SSM3 <- raster(paste0(GSOCseq_folder,ISO, "_GSOCseq_RSR_SSM3_Map030.tif"))
 
 RSR <- stack(SSM1,SSM2,SSM3)
 
-lu <- projectRaster(lu, SSM1, method= "ngb")
+lu  <- crop(lu, SSM1)
+lu <- mask(lu, SSM1)
+#lu <- projectRaster(lu, SSM1, method= "ngb")
 
 #Calculate mean
 stats_mean <- as.data.frame(round(zonal(RSR,lu, fun ="mean",na.rm = TRUE), 2))
@@ -83,10 +85,22 @@ colnames(RSR_stats) <- cns
 
 #RSR_stats <- rbind(units, RSR_stats)
 RSR_stats$`Land use` <-as.factor(RSR_stats$`Land use`)
-levels(RSR_stats$`Land use`) <-c("Artificial", "Croplands", "Grasslands", "Tree Covered", "Shrublands", "Herbaceous vegetation flooded",
-                                 "Mangroves", "Sparse Vegetation", "Bare soil", "Snow and Glaciers", "Waterbodies","Treecrops", "Paddy fields")
-
-
+#   0 = 0	  No Data
+#	190 = 1 Artificial
+#	10 11 30 40 = 2 Croplands
+#	130 = 3 Grassland
+#	50 60 61 62 70 71 72 80 81 82 90 100 110 = 4 Tree Covered
+#	120 121 122= 5 Shrubs Covered
+#	160 180 = 6 Herbaceous vegetation flooded
+#	170 = 7 Mangroves
+#	150 151 152 153= 8 Sparse Vegetation
+#	200 201 202 = 9 Baresoil
+#	220 = 10 Snow and Glaciers
+#	210 = 11 Waterbodies
+#	12  = 12 Treecrops
+# 20 = 13 Paddy fields(rice/ flooded crops)
+levels(RSR_stats$`Land use`) <-c( "Croplands", "Grasslands", "Shrublands", "Tree Crops", "Croplands")
+RSR_stats <- aggregate(RSR_stats[, 2:8], by=list(RSR_stats$`Land use`), FUN=sum)
 RSR_stats <- RSR_stats[complete.cases(RSR_stats[,6:8]),]
 
 
@@ -133,9 +147,8 @@ colnames(ASR_stats) <- cns
 
 #ASR_stats <- rbind(units, ASR_stats)
 ASR_stats$`Land use` <-as.factor(ASR_stats$`Land use`)
-levels(ASR_stats$`Land use`) <-c("Artificial", "Croplands", "Grasslands", "Tree Covered", "Shrublands", "Herbaceous vegetation flooded",
-                                 "Mangroves", "Sparse Vegetation", "Bare soil", "Snow and Glaciers", "Waterbodies","Treecrops", "Paddy fields")
-
+levels(ASR_stats$`Land use`) <-c( "Croplands", "Grasslands", "Shrublands", "Tree Crops", "Croplands")
+ASR_stats <- aggregate(ASR_stats[, 2:10], by=list(ASR_stats$`Land use`), FUN=sum)
 
 ASR_stats <- ASR_stats[complete.cases(ASR_stats[,6:10]),]
 

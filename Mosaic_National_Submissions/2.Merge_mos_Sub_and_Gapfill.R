@@ -22,8 +22,8 @@ library(stringr)
 #Define folders
 gapfill_dir <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/GapFill_220821/"
 mask_gap_dir <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/GapFill_220821/sub_masked/"
-sub_dir<- "C:/Users/hp/Documents/FAO/GSOCseq/National_submissions/GSOCseq_V1.0.0/combined/"
-out_sub_gap  <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/sub_and_gap/"
+sub_dir<- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0/only_subs/Merged_submissions/"
+out_sub_gap  <- "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0/"
 
 # Create mask layer based on submissions and blanks
 
@@ -47,35 +47,35 @@ gsheet <-gsheet[, c("ISO", "Country") := tstrsplit(Country, "; ", fixed=TRUE)]
 
 #Select unique ISOs
 gsheet  <- gsheet[!duplicated(gsheet$ISO),"ISO"]
-gsheet <-gsheet[gsheet$ISO!="USA",]
+#gsheet <-gsheet[gsheet$ISO!="USA",]
 exclude <- c(blanks, gsheet$ISO)
 
-# #Load UN country boarders (can be found on gdrive)
-# map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
-# map <-  map[!(map$ISO3CD %in% exclude),]
-# 
-# #Create a spatraster to use as a mask layer 
-# map <- vect(map)
-# 
-# #Gapfill layer files
-# GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=T)
-# 
-# g <-rast(GAPS[1])
-# map <- rasterize(map, g)
-# 
-# #Update date in the name
-# writeRaster(map, "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif", overwrite=TRUE)
-# #map <-rast("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif")
-# GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=F)
-# 
-# #Mask all gap-fill layers
-# for (i in 1:length(GAPS)){
-#   g <-rast(paste0(gapfill_dir, GAPS[i]))
-#   g <- mask(g, map)
-# 
-#   writeRaster(g, paste0(mask_gap_dir, GAPS[i]),overwrite=TRUE)
-#   print(paste("Masked:",GAPS[i]))
-# }
+#Load UN country boarders (can be found on gdrive)
+map <- readOGR("C:/Users/hp/Documents/FAO/data/un_maps/Official UN Map/UN_Map_v2020/UNmap0_shp/BNDA_CTY.shp")
+map <-  map[!(map$ISO3CD %in% exclude),]
+
+#Create a spatraster to use as a mask layer
+map <- vect(map)
+
+#Gapfill layer files
+GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=T)
+
+g <-rast(GAPS[1])
+map <- rasterize(map, g)
+
+#Update date in the name
+writeRaster(map, "C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.1.0/blank_sub_mask_2709.tif", overwrite=TRUE)
+#map <-rast("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_V1.0.0/blank_sub_mask_2308.tif")
+GAPS <- list.files(path= gapfill_dir,pattern='.tif',full.names=F)
+
+#Mask all gap-fill layers
+for (i in 1:length(GAPS)){
+  g <-rast(paste0(gapfill_dir, GAPS[i]))
+  g <- mask(g, map)
+
+  writeRaster(g, paste0(mask_gap_dir, GAPS[i]),overwrite=TRUE)
+  print(paste("Masked:",GAPS[i]))
+}
 
 
 

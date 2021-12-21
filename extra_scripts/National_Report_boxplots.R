@@ -18,18 +18,18 @@ library(data.table)
 # User defined variables
 
 ## Working directory (wd). It should end with a "/"
-wd <- "C:/Users/hp/Documents/FAO/GSOCseq/"
+wd <- "C:/Users/hp/Documents/FAO/GSOCseq/Joint Maps/NENA/"
 #wd <- "C:/Users/luottoi/Documents/GSOCseq/"
 
 
 ## GSOCseq output maps directory. The paste0 function will combine
 ## your working directory wd with the folder name that contains
 ## your output maps
-GSOCseq_folder <- paste0(wd,"Argentina/")
+GSOCseq_folder <- paste0(wd,"SDN/")
 
 
 ## Country of interest (specified by the 3-digit ISO code)
-ISO <- "ARG"
+ISO <- "SDN"
 
 
 # Set the working directory
@@ -37,7 +37,8 @@ setwd(wd)
 
 #Load land use map ESA (the same one used for the modeling exercise)
 
-lu <- raster("Argentina/ESA_Land_Cover_12clases_FAO_AOI.tif")
+lu <- raster("C:/Users/hp/Documents/FAO/GSOCseq/GSOCseq_Results_data/LU/ESA_Land_Cover_12clases_FAO_World_2015_1km.tif")
+
 
 
 #################################
@@ -54,7 +55,8 @@ lu <- raster("Argentina/ESA_Land_Cover_12clases_FAO_AOI.tif")
 RSR1 <- raster(paste0(GSOCseq_folder, ISO,"_GSOCseq_RSR_SSM1_Map030.tif"))
 RSR2<- raster(paste0(GSOCseq_folder,ISO, "_GSOCseq_RSR_SSM2_Map030.tif"))
 RSR3 <- raster(paste0(GSOCseq_folder,ISO, "_GSOCseq_RSR_SSM3_Map030.tif"))
-
+lu  <- crop(lu, RSR1)
+lu <- mask(lu, RSR1)
 
 # Combine all layers into a brick and turn into data.frame
 data <- brick(RSR1,RSR2,RSR3,lu)
@@ -67,8 +69,7 @@ colnames(data) <-cn
 
 #Re-level land use factor levels
 data$`Land use` <-as.factor(data$`Land use`)
-levels(data$`Land use`) <-c("Artificial", "Croplands", "Grasslands", "Tree Covered", "Shrublands", "Herbaceous vegetation flooded",
-                                 "Mangroves", "Sparse Vegetation", "Bare soil", "Snow and Glaciers", "Waterbodies","Treecrops", "Paddy fields")
+levels(data$`Land use`) <-c( "Croplands", "Grasslands", "Shrublands", "Tree Crops", "Croplands")
 
 #Remove NAs and round results
 data <- data[complete.cases(data),]
@@ -109,9 +110,7 @@ colnames(data_a) <-cn
 
 #Re-level land use factor levels
 data_a$`Land use` <-as.factor(data_a$`Land use`)
-levels(data_a$`Land use`) <-c("Artificial", "Croplands", "Grasslands", "Tree Covered", "Shrublands", "Herbaceous vegetation flooded",
-                            "Mangroves", "Sparse Vegetation", "Bare soil", "Snow and Glaciers", "Waterbodies","Treecrops", "Paddy fields")
-
+levels(data_a$`Land use`) <-c( "Croplands", "Grasslands", "Shrublands", "Tree Crops", "Croplands")
 
 #Remove NAs and round results
 data_a <- data_a[complete.cases(data_a),]
