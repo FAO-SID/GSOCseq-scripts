@@ -18,12 +18,12 @@ gc()
 
 # Working directory
 #wd <- 'C:/Users/luottoi/Documents/GitHub/Digital-Soil-Mapping'
-wd <- 'C:/Users/hp/Documents/FAO/GSOCseq/rgee'
+wd <- 'C:/Users/hp/Documents/FAO/GSOCseq/Syria'
 
 
 # Area of interest: either own shapefile or 3-digit ISO code to extract from UN 2020 boundaries
 #AOI <- '01-Data/MKD.shp'
-AOI <- 'AUS'
+AOI <- 'SYR'
 
 # GEE Resolution (CRS defined based on the first TerraClimate layer WGS84 )
 res = 1000
@@ -97,30 +97,31 @@ inList <- ee$List(c(0  ,20  ,30  ,40  ,50  ,60  ,70  ,80  ,90 ,100 ,111 ,112 ,11
 outList <- ee$List(c(0,  5,  3,  2,  0,  0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0))
 
 
-# # Extract points for target classes
-# FAO_lu<- image1$remap(inList, outList)
-# FAO_lu <-FAO_lu$toDouble()
-# FAO_lu =FAO_lu$clip(region)
-# #Convert 0 to NA
-# mask <- FAO_lu$neq(0)
-# FAO_lu <- FAO_lu$updateMask(mask)
+# Extract points for target classes
+FAO_lu<- image1$remap(inList, outList)
+FAO_lu <-FAO_lu$toDouble()
+FAO_lu =FAO_lu$clip(region)
+#Convert 0 to NA
+mask <- FAO_lu$neq(0)
+FAO_lu <- FAO_lu$updateMask(mask)
 #Obtain points
-# points <- FAO_lu$sample(
-#   region=region,
-#   geometries=T,
-#   scale=res
-# )
-# 
-# maxNum <- points$aggregate_count('remapped')
-# maxNum <- maxNum$getInfo()
-# 
-# # Export vector points
-# points_shp <-ee_as_sf(points
-#                       ,maxFeatures = maxNum
-# )
-# write_sf(points_shp, paste0('target_points_',AOI,'.shp'))
+points <- FAO_lu$sample(
+  region=region,
+  geometries=T,
+  scale=res
+)
 
-# Solution for very large countries (split in croplands, grasslands and shrublands) 
+maxNum <- points$aggregate_count('remapped')
+maxNum <- maxNum$getInfo()
+
+## Export vector points
+ points_shp <-ee_as_sf(points
+                       ,maxFeatures = maxNum
+                       , via = "drive" 
+ )
+write_sf(points_shp, paste0('target_points_',AOI,'.shp'))
+
+# Solution for very large countries (split in croplands, grasslands and shrublands)
 
 #Reclassify 
 #CROPLANDS
@@ -182,7 +183,7 @@ rm(points_grass)
 
 write_sf(points_shp, paste0('target_points_',AOI,'.shp'))
 
-#Export raster will all FAO classes
+#Export raster with all FAO classes
 #Reclassify 
 outList <- ee$List(c(0,  5,  3,  2,  1,  9, 10, 11,  7,  0,  4,  4,  4,  4,  4,  4,  4,  4, 4,  4,  4,  4,  0))
 
