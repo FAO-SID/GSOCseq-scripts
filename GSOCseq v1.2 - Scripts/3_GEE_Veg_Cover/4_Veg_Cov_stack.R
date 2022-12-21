@@ -38,6 +38,7 @@ SOC_MAP<-rast(SOC_path)
 
 # Open Vegetation Cover layer based only in proportion of NDVI pixels grater than 0.6 
 files <- list.files(path='INPUTS/COV/', pattern='.tif', full.names = T)
+files <- files[grepl('_prop_gt' ,files)]
 
 Rlist =list()
 for (i in 1:length(files)){

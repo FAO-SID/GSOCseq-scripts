@@ -37,6 +37,7 @@ SOC_MAP<-rast(SOC_path)#DATE: 12-11-2020
 
 # Open Clay layers  (ISRIC)
 files <- list.files(path='INPUTS/CLAY/', pattern='.tif', full.names = T)
+files <- files[grepl('CLYPPT_M' ,files)]
 
 clay <- rast(files)
 

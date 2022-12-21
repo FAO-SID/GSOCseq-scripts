@@ -32,7 +32,7 @@ AOI <- vect(AOI_path)
 # Open Land Use Layer (ESA)
 
 ESA_LU<-rast(Lu_raw_path)
-plot(ESA_LU[[1]])
+#plot(ESA_LU[[1]])
 
 # Cut the LU layer by the country polygon
 ESA_LU<-crop(ESA_LU,AOI)
@@ -50,12 +50,12 @@ plot(ESA_LU[[1:4]])
 #	160 180 = 6 Herbaceous vegetation flooded
 #	170 = 7 Mangroves
 #	150 151 152 153= 8 Sparse Vegetation
-#	200 201 202 = 9 Baresoil
+#	200 201 202 = 9 Bare soil
 #	220 = 10 Snow and Glaciers
 #	210 = 11 Waterbodies
 #	12  = 12 Treecrops
 # 20 = 13 Paddy fields(rice/ flooded crops)
-
+# upland r
 # Create a reclassification matrix. "Is" to "become"
 is<-c(0,190,10,11,30,40,130,50,60,61,62,70,71,72,80,81,82,90,100,110,120,121,122,160,180,
 170,150,151,152,153,200,201,202,220,210,12,20)
@@ -77,7 +77,7 @@ FAO_LU<-mask(FAO_LU,SOC_MAP_AOI)
 writeRaster(FAO_LU,filename=paste0("INPUTS/LAND_USE/",ISO,"ESA_Land_Cover_13clases_FAO_Stack.tif"),overwrite=TRUE)
 
 # We save separately the land use from 2020 to perform the target´s points creation
-writeRaster(FAO_LU[[length(FAO_LU)]],filename=paste0("INPUTS/LAND_USE/",ISO,
+writeRaster(FAO_LU[[dim(FAO_LU)[3]]],filename=paste0("INPUTS/LAND_USE/",ISO,
                                                      "_ESA_Land_Cover_13clases_FAO_2020.tif"),overwrite=TRUE)
 
 

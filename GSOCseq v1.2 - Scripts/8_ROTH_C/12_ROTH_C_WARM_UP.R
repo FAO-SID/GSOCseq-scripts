@@ -67,9 +67,9 @@ NPP_MEAN_MIN<-rast("INPUTS/NPP_TERRA/NPP_MIAMI_MEAN_81-00_AOI_MIN.tif")
 
 NPP_MEAN_MAX<-rast("INPUTS/NPP_TERRA/NPP_MIAMI_MEAN_81-00_AOI_MAX.tif")
 
-#Open the land use layer (year 2000).
+#Open the land use layer 
 LU_stack<-rast("INPUTS/LAND_USE/THA_NP_ESA_Land_Cover_13clases_FAO_Stack.tif")
-LU_AOI <-LU_stack[[1]]
+LU_AOI <-LU_stack[[dim(LU_stack)[3]]]
 NPP<-resample(NPP,LU_AOI,method='bilinear')
 NPP_MEAN_MIN<-resample(NPP_MEAN_MIN,LU_AOI,method='bilinear')
 NPP_MEAN_MAX<-resample(NPP_MEAN_MAX,LU_AOI, method='bilinear')
@@ -89,7 +89,8 @@ clim <- resample(clim, LU_AOI,method='bilinear')
 
 Stack_Set_warmup <- c(Stack_Set_warmup,clim,NPP,NPP_MEAN_MIN,NPP_MEAN_MAX)
 # Extract variables to points
-Vector_points<-extract(Stack_Set_warmup_ALL,WARM_UP,xy=T)
+Vector_points<-extract(Stack_Set_warmup,WARM_UP,xy=T)
+Vector_points <-Vector_points[complete.cases(Vector_points),] 
 Vector_points <-vect(Vector_points, geom=c('x','y'))
 
 # Approach without resampling the climatic layers 
@@ -116,8 +117,11 @@ nppBand_min<-nppBand+1
 
 nppBand_max<-nppBand+2
 
-nDR_beg<-(20+yearsSimulation)+20
+nDR_beg<-(4+12+yearsSimulation)
 nDR_end<-nDR_beg+(yearsSimulation-1)
+
+nLU_beg <-4+12 
+nLU_end <-(3+12+yearsSimulation)
 
 # Extract the layers from the Vector
 
@@ -299,6 +303,9 @@ system.time({
           DR_im<-as.data.frame(t(Vect[nDR_beg:nDR_end])) # DR one per year according to LU
           DR_im<-data.frame(DR_im=DR_im[,1])
           
+          LU<-as.data.frame(t(Vect[nLU_beg:nLU_end])) # DR one per year according to LU
+          LU<-data.frame(LU=LU[,1])
+          
           gt<-gt+12
           gp<-gp+12
           gevp<-gevp+12
@@ -307,7 +314,7 @@ system.time({
           
           clay_im<-Vector_variables2@data[[i,3]] 
           
-          LU_im<-Vector_variables2@data[[i,40]]
+          
           
           NPP_im<-Vector_variables2@data[[i,nppBand]]
           
@@ -328,6 +335,7 @@ system.time({
             clay<-clay_im        #Percent clay %
             
             DR<-DR_im[w,1]              # DPM/RPM (decomposable vs resistant plant material)
+            LU_im<-LU[w,1] 
             bare1<-(Cov1>0.8)           # If the surface is bare or vegetated
             NPP_81_00<-NPP_im
             NPP_81_00_MIN<-NPP_im_MIN
